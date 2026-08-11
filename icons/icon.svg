@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="BEYOND">
+  <rect width="1024" height="1024" fill="#000"/>
+  <g fill="#fff" transform="translate(512 430)">
+    <!-- Geometric B with mid-stem notch -->
+    <path fill-rule="evenodd" d="
+      M -210 -250
+      L -145 -250
+      L 55 -250
+      C 195 -250, 285 -170, 285 -55
+      C 285 25, 235 80, 145 105
+      C 250 125, 320 195, 320 295
+      C 320 425, 205 500, 40 500
+      L -145 500
+      L -210 500
+      L -210 145
+      L -120 75
+      L -210 5
+      Z
+      M -95 -145
+      L -95 20
+      L 40 20
+      C 115 20, 165 -25, 165 -70
+      C 165 -120, 115 -145, 40 -145
+      Z
+      M -95 180
+      L -95 390
+      L 40 390
+      C 140 390, 200 335, 200 275
+      C 200 215, 140 180, 40 180
+      Z
+    "/>
+  </g>
+  <text
+    x="512"
+    y="900"
+    text-anchor="middle"
+    fill="#fff"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="86"
+    font-weight="700"
+    letter-spacing="16"
+  >BEYOND</text>
+</svg>

@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+*.log
+.node_modules/
+.firebase/
+firebase-debug.log
+.firebaserc.local
+.env
+.env.*
+!.env.example
+*.local
+.vscode/
+.idea/

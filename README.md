@@ -84,16 +84,19 @@ service cloud.firestore {
 }
 ```
 
-### 6. Выложи сайт и скинь ссылку
+### 6. Выложи сайт (GitHub Pages, бесплатно)
 
-Самый простой вариант — [Netlify Drop](https://app.netlify.com/drop):
+Автодеплой уже настроен: каждый `push` в `main` публикует сайт.
 
-1. Зарегистрируйся
-2. Перетащи папку `beyond` в окно
-3. Получишь ссылку вида `https://something.netlify.app`
-4. Эту ссылку можно скинуть
+1. Создай репозиторий на GitHub (если ещё нет) и запушь `main`
+2. В репо: **Settings → Pages → Source → GitHub Actions**
+3. После первого успешного workflow ссылка будет вида  
+   `https://<username>.github.io/beyond/`
 
-Или Vercel / GitHub Pages — любой хостинг статики.
+Данные пользователей **не на хостинге**: они в Firebase Auth + Firestore.  
+Смена Netlify → GitHub Pages не стирает прогресс — меняется только URL сайта.
+
+Запасной вариант — Firebase Hosting (`firebase.json` уже лежит в проекте).
 
 ## Как пользоваться вдвоём
 

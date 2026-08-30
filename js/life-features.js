@@ -93,6 +93,7 @@ window.LifeFeatures = (function(){
       if(!Array.isArray(state.weekPlan[wd].items)) state.weekPlan[wd].items = [];
     }
     state.goals.forEach(function(g){ if(!g.link) g.link = { type:"manual" }; });
+    normalizeLinkedGoalUnits(state);
 
     if(state.workouts && state.workouts.some(function(w){ return w.type==="strength"; })){
       state.workouts.filter(function(w){ return w.type==="strength"; }).forEach(function(w){
@@ -304,8 +305,29 @@ window.LifeFeatures = (function(){
     } else { deps.save(); deps.render(); }
   }
 
-  function addOneOffTask(text, due){
-    S().tasks.push({ id:deps.uid(), text:text, due:due||"today", done:false, rewarded:false, createdAt:Date.now() });
+  function tomorrowWeekday(todayWd){
+    return (todayWd + 1) % 7;
+  }
+
+  function oneOffTasksForWeekday(wd, todayWd){
+    const tomorrowWd = tomorrowWeekday(todayWd);
+    return (S().tasks || []).filter(function(t){
+      if(!t || t.daily) return false;
+      if(typeof t.dueWeekday === "number") return t.dueWeekday === wd;
+      if((t.due || "today") === "today") return wd === todayWd;
+      if(t.due === "tomorrow") return wd === tomorrowWd;
+      return false;
+    });
+  }
+
+  function addOneOffTask(text, due, weekday){
+    const task = { id:deps.uid(), text:text, done:false, rewarded:false, createdAt:Date.now() };
+    if(weekday !== undefined && weekday !== null && weekday !== ""){
+      task.dueWeekday = Number(weekday);
+    } else {
+      task.due = due || "today";
+    }
+    S().tasks.push(task);
     deps.save(); deps.render();
   }
 
@@ -399,6 +421,30 @@ window.LifeFeatures = (function(){
   }
 
   /* ---- Goals ---- */
+  function goalDefaultUnit(d){
+    if(!d || d.type==="manual") return "";
+    if(d.type==="books") return "книг";
+    if(d.type==="cardio") return (d.metric||"minutes")==="km" ? "км" : "мин";
+    if(d.type==="vice") return "дней";
+    if(d.type==="exercise") return "кг";
+    return "";
+  }
+
+  function goalDisplayUnit(g){
+    const link = g.link || { type:"manual" };
+    if(link.type !== "manual") return goalDefaultUnit(link) || g.unit || "";
+    return g.unit || "";
+  }
+
+  function normalizeLinkedGoalUnits(state){
+    (state.goals||[]).forEach(function(g){
+      if(g.link && g.link.type !== "manual"){
+        const unit = goalDefaultUnit(g.link);
+        if(unit) g.unit = unit;
+      }
+    });
+  }
+
   function linkedGoalValue(g){
     const state = S();
     const link = g.link || { type:"manual" };
@@ -537,11 +583,16 @@ window.LifeFeatures = (function(){
   /* ---- Week plan ---- */
   function planProductivity(weekday, dateKey){
     const state = S();
+    const todayWd = new Date().getDay();
     const items = (state.weekPlan[weekday]||{items:[]}).items.filter(function(i){ return i.icon!=="😴"; });
-    if(!items.length) return { done:0, total:0, pct:0 };
-    const done = state.weekDone[dateKey]||{};
-    const dc = items.filter(function(i){ return done[i.id]; }).length;
-    return { done:dc, total:items.length, pct: Math.round((dc/items.length)*100) };
+    const oneOffs = weekday === todayWd ? oneOffTasksForWeekday(weekday, todayWd) : [];
+    if(!items.length && !oneOffs.length) return { done:0, total:0, pct:0 };
+    const doneMap = state.weekDone[dateKey]||{};
+    const planDone = items.filter(function(i){ return doneMap[i.id]; }).length;
+    const onceDone = oneOffs.filter(function(t){ return t.done; }).length;
+    const done = planDone + onceDone;
+    const total = items.length + oneOffs.length;
+    return { done:done, total:total, pct: Math.round((done/total)*100) };
   }
 
   function addPlanItem(weekday, label, icon){
@@ -648,14 +699,23 @@ window.LifeFeatures = (function(){
       const flame = h.streak>0 ? '<span class="habit-streak' + (done?" lit":"") + '">🔥 ' + h.streak + '</span>' : '<span class="habit-streak zero">—</span>';
       return '<div class="habit-row ' + (done?"habit-done":"") + (rest?" habit-rest":"") + '"><button class="habit-check ' + (done?"on":"") + '" data-action="toggle-habit" data-id="' + h.id + '">' + (done?"✓":"") + '</button><div class="habit-main"><span class="habit-text">' + e(h.text) + '</span><span class="habit-rhythm">' + rhythmLabel(h) + (rest?" · выходной":"") + '</span></div>' + flame + '<button class="btn-icon" data-action="delete-habit" data-id="' + h.id + '">✕</button></div>';
     }).join('') : '<div class="empty-state">Добавь привычку с ритмом.</div>';
-    const todayTasks = state.tasks.filter(function(t){ return (t.due||"today")==="today"; });
-    const tomorrowTasks = state.tasks.filter(function(t){ return t.due==="tomorrow"; });
-    function taskRow(t){
-      return '<label class="task-row ' + (t.done?"task-done":"") + '"><input type="checkbox" data-action="toggle-oneoff-task" data-id="' + t.id + '" ' + (t.done?"checked":"") + '><span class="task-check"></span><span class="task-text">' + e(t.text) + '</span><button type="button" class="btn-icon" data-action="delete-oneoff-task" data-id="' + t.id + '">✕</button></label>';
-    }
-    return '<div class="screen-head"><h2>Задачи и привычки</h2><p class="screen-sub">Привычки — по ритму. Задачи — разовые на сегодня/завтра.</p></div>' +
-      '<div class="section-block"><div class="section-head"><h3>🔥 Привычки</h3></div><div class="panel form-panel"><form data-form="add-habit" class="habit-add-form"><input name="text" placeholder="Новая привычка" required maxlength="80"><select name="rhythm" class="habit-rhythm-select"><option value="d1">Каждый день</option><option value="d2">Через день</option><option value="d3">Каждые 3 дня</option><option value="wd_135">Пн/Ср/Пт</option><option value="wd_246">Вт/Чт/Сб</option><option value="wd_67">Выходные</option><option value="wd_12345">Будни</option></select><button class="btn btn-primary" type="submit">Добавить</button></form></div><div class="list-panel">' + habitRows + '</div></div>' +
-      '<div class="section-block" style="margin-top:26px"><div class="section-head"><h3>✅ Задачи</h3></div><div class="panel form-panel"><form data-form="add-oneoff-task" class="habit-add-form"><input name="text" placeholder="Разовая задача" required maxlength="80"><select name="due"><option value="today">Сегодня</option><option value="tomorrow">Завтра</option></select><button class="btn btn-primary" type="submit">Добавить</button></form></div><div class="list-panel"><h3>Сегодня</h3>' + (todayTasks.length?todayTasks.map(taskRow).join(''):'<div class="empty-state">Пусто</div>') + '<h3>Завтра</h3>' + (tomorrowTasks.length?tomorrowTasks.map(taskRow).join(''):'<div class="empty-state">Пусто</div>') + '</div></div>';
+    const planLink = state.trackedAreas && (state.trackedAreas.tasks || state.trackedAreas.workouts)
+      ? '<p class="screen-sub plan-hint">Разовые задачи и план по дням — во вкладке <button type="button" class="linkish" data-action="nav" data-screen="weekplan">План</button>.</p>'
+      : '';
+    return '<div class="screen-head"><h2>Привычки</h2><p class="screen-sub">Повторяющиеся дела по ритму — каждый день, через день, по дням недели.</p>' + planLink + '</div>' +
+      '<div class="section-block"><div class="panel form-panel"><form data-form="add-habit" class="habit-add-form"><input name="text" placeholder="Новая привычка" required maxlength="80"><select name="rhythm" class="habit-rhythm-select"><option value="d1">Каждый день</option><option value="d2">Через день</option><option value="d3">Каждые 3 дня</option><option value="wd_135">Пн/Ср/Пт</option><option value="wd_246">Вт/Чт/Сб</option><option value="wd_67">Выходные</option><option value="wd_12345">Будни</option></select><button class="btn btn-primary" type="submit">Добавить</button></form></div><div class="list-panel">' + habitRows + '</div></div>';
+  }
+
+  function renderOneOffPlanItem(t, wd, todayWd){
+    const isToday = wd === todayWd;
+    const done = !!t.done;
+    return '<div class="plan-item plan-item-once ' + (done?"done":"") + '">' +
+      (isToday
+        ? '<button type="button" class="plan-check plan-check-once ' + (done?"on":"") + '" data-action="toggle-oneoff-task" data-id="' + t.id + '">' + (done?"✓":"") + '</button>'
+        : '<span class="plan-dot plan-dot-once" title="Разовая задача">⚡</span>') +
+      '<span class="plan-item-label">' + e(t.text) + '</span>' +
+      '<span class="plan-once-tag">разовая</span>' +
+      '<button type="button" class="plan-item-del" data-action="delete-oneoff-task" data-id="' + t.id + '">✕</button></div>';
   }
 
   function goalCard(g){
@@ -664,7 +724,7 @@ window.LifeFeatures = (function(){
     const linked = g.link && g.link.type !== "manual";
     const linkBadge = linked ? '<div class="goal-link">' + goalLinkLabel(g) + '</div>' : "";
     const foot = linked ? '<span class="goal-auto">обновляется автоматически</span>' : '<form data-form="update-goal" data-id="' + g.id + '" class="goal-update"><input name="current" type="number" step="0.1" value="' + g.current + '"><button class="btn btn-ghost btn-sm" type="submit">Обновить</button></form>';
-    return '<div class="panel goal-card"><div class="goal-head"><div><div class="goal-title">' + e(g.title) + (complete?' <span class="badge badge-done">Достигнуто</span>':"") + '</div>' + (g.description?'<div class="goal-desc">' + e(g.description) + '</div>':"") + linkBadge + '</div><button class="btn-icon" data-action="delete-goal" data-id="' + g.id + '">✕</button></div>' + bar(g.current, g.target||1, "--gold", 14) + '<div class="goal-foot"><span>' + g.current + " / " + g.target + " " + e(g.unit) + " · " + pct.toFixed(0) + '%</span>' + foot + '</div></div>';
+    return '<div class="panel goal-card"><div class="goal-head"><div><div class="goal-title">' + e(g.title) + (complete?' <span class="badge badge-done">Достигнуто</span>':"") + '</div>' + (g.description?'<div class="goal-desc">' + e(g.description) + '</div>':"") + linkBadge + '</div><button class="btn-icon" data-action="delete-goal" data-id="' + g.id + '">✕</button></div>' + bar(g.current, g.target||1, "--gold", 14) + '<div class="goal-foot"><span>' + g.current + " / " + g.target + " " + e(goalDisplayUnit(g)) + " · " + pct.toFixed(0) + '%</span>' + foot + '</div></div>';
   }
 
   function renderGoals(){
@@ -680,7 +740,10 @@ window.LifeFeatures = (function(){
     if(d.type==="cardio") sub = '<div class="goal-subrow"><div class="goal-chips"><button type="button" class="goal-chip small ' + ((d.metric||"minutes")==="minutes"?"active":"") + '" data-action="goal-cardio-metric" data-metric="minutes">⏱️ Минуты</button><button type="button" class="goal-chip small ' + (d.metric==="km"?"active":"") + '" data-action="goal-cardio-metric" data-metric="km">📏 Км</button></div></div>';
     if(d.type==="vice" && state.vices.length) sub = '<div class="goal-subrow"><div class="goal-chips">' + state.vices.map(function(v){ return '<button type="button" class="goal-chip small ' + (d.refId===v.id?"active":"") + '" data-action="goal-link-ref" data-id="' + v.id + '">' + v.icon + " " + e(v.name) + '</button>'; }).join('') + '</div></div>';
     const curField = d.type==="manual" ? '<div class="field"><label>Текущий</label><input name="current" type="number" step="0.1" value="0"></div>' : '<input type="hidden" name="current" value="0">';
-    return '<div class="screen-head"><h2>Цели</h2><p class="screen-sub">Привяжи к упражнению, книгам или кардио — обновится сама.</p></div><div class="panel form-panel"><form data-form="add-goal-linked" class="form-grid"><div class="field field-wide"><label>Название</label><input name="title" required maxlength="80" placeholder="Жим 100 кг"></div><div class="field field-wide"><label>Что отслеживаем?</label><div class="goal-chips">' + chips + '</div>' + sub + '</div><div class="field"><label>Цель</label><input name="target" type="number" step="0.1" required></div><div class="field"><label>Единица</label><input name="unit" maxlength="20" placeholder="кг, мин, книг…"></div>' + curField + '<button class="btn btn-primary" type="submit">Создать</button></form></div><div class="list-panel goal-list">' + list + '</div>';
+    const unitField = d.type==="manual"
+      ? '<div class="field"><label>Единица</label><input name="unit" maxlength="20" placeholder="кг, мин, книг…"></div>'
+      : '<input type="hidden" name="unit" value="' + e(goalDefaultUnit(d)) + '">';
+    return '<div class="screen-head"><h2>Цели</h2><p class="screen-sub">Привяжи к упражнению, книгам или кардио — обновится сама.</p></div><div class="panel form-panel"><form data-form="add-goal-linked" class="form-grid"><div class="field field-wide"><label>Название</label><input name="title" required maxlength="80" placeholder="Жим 100 кг"></div><div class="field field-wide"><label>Что отслеживаем?</label><div class="goal-chips">' + chips + '</div>' + sub + '</div><div class="field"><label>Цель</label><input name="target" type="number" step="0.1" required></div>' + unitField + curField + '<button class="btn btn-primary" type="submit">Создать</button></form></div><div class="list-panel goal-list">' + list + '</div>';
   }
 
   function viceCard(v){
@@ -695,8 +758,11 @@ window.LifeFeatures = (function(){
   }
 
   function renderVices(){
-    const cards = S().vices.map(viceCard).join('') + '<button class="vice-add-card" data-action="add-vice-prompt"><span class="plus">+</span>Добавить</button>';
-    return '<div class="screen-head"><h2>Вредные привычки</h2><p class="screen-sub">Отмечай меньше — растёт дисциплина.</p></div><div class="vice-grid">' + cards + '</div>';
+    const vices = S().vices;
+    const cards = vices.length
+      ? vices.map(viceCard).join('')
+      : '<div class="empty-state vice-empty">Пока нет привычек. Добавь первую — курение, скролл, игры и своё.</div>';
+    return '<div class="screen-head"><h2>Вредные привычки</h2><p class="screen-sub">Отмечай меньше — растёт дисциплина.</p></div><div class="vice-grid">' + cards + '<button class="vice-add-card" data-action="add-vice-prompt"><span class="plus">+</span>Добавить</button></div>';
   }
 
   function viceModalBars(v){
@@ -735,29 +801,52 @@ window.LifeFeatures = (function(){
 
   function renderWeekPlan(){
     const state = S(), todayWd = new Date().getDay(), todayK = deps.todayKey(), order = [1,2,3,4,5,6,0];
+    const dueOptions = '<option value="today">Сегодня</option><option value="tomorrow">Завтра</option>' +
+      order.map(function(wd){
+        return '<option value="wd:' + wd + '">' + WEEKDAY_NAMES[wd] + '</option>';
+      }).join('');
     const cards = order.map(function(wd){
       const day = state.weekPlan[wd]||{items:[]}, isToday = wd===todayWd, prod = planProductivity(wd, todayK);
-      const rows = day.items.length ? day.items.map(function(it){
+      const weeklyRows = day.items.map(function(it){
         const done = isToday && state.weekDone[todayK] && state.weekDone[todayK][it.id];
-        return '<div class="plan-item ' + (done?"done":"") + '">' + (isToday?'<button class="plan-check ' + (done?"on":"") + '" data-action="toggle-plan-done" data-id="' + it.id + '">' + (done?"✓":"") + '</button>':'<span class="plan-dot">' + it.icon + '</span>') + '<span class="plan-item-label">' + e(it.label) + '</span><button class="plan-item-del" data-action="remove-plan-item" data-day="' + wd + '" data-id="' + it.id + '">✕</button></div>';
-      }).join('') : '<div class="plan-empty">Пусто</div>';
+        return '<div class="plan-item plan-item-weekly ' + (done?"done":"") + '">' + (isToday?'<button type="button" class="plan-check ' + (done?"on":"") + '" data-action="toggle-plan-done" data-id="' + it.id + '">' + (done?"✓":"") + '</button>':'<span class="plan-dot">' + it.icon + '</span>') + '<span class="plan-item-label">' + e(it.label) + '</span><button type="button" class="plan-item-del" data-action="remove-plan-item" data-day="' + wd + '" data-id="' + it.id + '">✕</button></div>';
+      }).join('');
+      const onceRows = oneOffTasksForWeekday(wd, todayWd).map(function(t){
+        return renderOneOffPlanItem(t, wd, todayWd);
+      }).join('');
+      const rows = weeklyRows + onceRows;
+      const rowsHtml = rows || '<div class="plan-empty">Пусто</div>';
       const prodBar = isToday && prod.total>0 ? '<div class="plan-prod"><div class="plan-prod-bar"><div class="plan-prod-fill" style="width:' + prod.pct + '%"></div></div><span class="plan-prod-lbl">' + prod.done + "/" + prod.total + " · " + prod.pct + "%</span></div>" : "";
-      const addForm = planEditDay===wd ? '<div class="plan-add"><div class="plan-muscle-grid">' + MUSCLE_PRESETS.map(function(m){ return '<button type="button" class="plan-muscle" data-action="add-plan-muscle" data-day="' + wd + '" data-key="' + m.key + '">' + m.icon + " " + m.label + '</button>'; }).join('') + '</div><form data-form="add-plan-custom" data-day="' + wd + '" class="form-inline plan-custom-form"><input name="label" placeholder="свой пункт" maxlength="40"><button class="btn btn-ghost btn-sm" type="submit">+ свой</button></form><button class="btn btn-ghost btn-sm" data-action="plan-edit-day" data-day="">Готово</button></div>' : '<button class="plan-add-btn" data-action="plan-edit-day" data-day="' + wd + '">+ Добавить</button>';
-      return '<div class="plan-day ' + (isToday?"is-today":"") + '"><div class="plan-day-head"><span class="plan-day-name">' + WEEKDAY_NAMES[wd] + (isToday?' <span class="plan-today-tag">сегодня</span>':"") + '</span></div><div class="plan-items">' + rows + '</div>' + prodBar + addForm + '</div>';
+      const muscleGrid = state.trackedAreas && state.trackedAreas.workouts
+        ? '<div class="plan-muscle-grid">' + MUSCLE_PRESETS.map(function(m){ return '<button type="button" class="plan-muscle" data-action="add-plan-muscle" data-day="' + wd + '" data-key="' + m.key + '">' + m.icon + " " + m.label + '</button>'; }).join('') + '</div>'
+        : '';
+      const addForm = planEditDay===wd
+        ? '<div class="plan-add">' + muscleGrid +
+          '<form data-form="add-plan-custom" data-day="' + wd + '" class="form-inline plan-custom-form"><input name="label" placeholder="еженедельный пункт" maxlength="40"><button class="btn btn-ghost btn-sm" type="submit">+ еженед.</button></form>' +
+          '<form data-form="add-oneoff-on-day" data-day="' + wd + '" class="form-inline plan-custom-form plan-once-form-inline"><input name="text" placeholder="разовая задача" maxlength="80" required><button class="btn btn-ghost btn-sm plan-once-add-btn" type="submit">+ разовая</button></form>' +
+          '<button class="btn btn-ghost btn-sm" data-action="plan-edit-day" data-day="">Готово</button></div>'
+        : '<button class="plan-add-btn" data-action="plan-edit-day" data-day="' + wd + '">+ Добавить</button>';
+      return '<div class="plan-day ' + (isToday?"is-today":"") + '"><div class="plan-day-head"><span class="plan-day-name">' + WEEKDAY_NAMES[wd] + (isToday?' <span class="plan-today-tag">сегодня</span>':"") + '</span></div><div class="plan-items">' + rowsHtml + '</div>' + prodBar + addForm + '</div>';
     }).join('');
-    return '<div class="screen-head"><h2>План недели</h2><p class="screen-sub">Распиши тренировки по дням.</p></div><div class="plan-grid">' + cards + '</div>';
+    const oncePanel = state.trackedAreas && state.trackedAreas.tasks
+      ? '<div class="panel form-panel plan-once-panel"><form data-form="add-oneoff-task" class="habit-add-form plan-once-top-form"><input name="text" placeholder="Разовая задача" required maxlength="80"><select name="due">' + dueOptions + '</select><button class="btn btn-primary" type="submit">Добавить разовую</button></form><div class="plan-legend"><span class="plan-legend-item"><span class="plan-dot">💪</span> еженедельно</span><span class="plan-legend-item plan-legend-once"><span class="plan-dot plan-dot-once">⚡</span> разовая</span></div></div>'
+      : '';
+    return '<div class="screen-head"><h2>План недели</h2><p class="screen-sub">Еженедельные пункты и разовые задачи — на одном календаре. Привычки с ритмом — отдельно во вкладке «Привычки».</p></div>' + oncePanel + '<div class="plan-grid">' + cards + '</div>';
   }
 
   function renderDashboardExtras(){
     const state = S(), todayWd = new Date().getDay(), todayK = deps.todayKey();
     let html = "";
     if(!state.vicesIntroSeen && !state.vices.length){
-      html += '<div class="panel vice-intro"><div class="vice-intro-ic">⚠️</div><div class="vice-intro-body"><div class="vice-intro-title">Побороть вредную привычку?</div><div class="vice-intro-text">Курение, скролл, сладкое — отмечай каждый день.</div></div><div class="vice-intro-actions"><button class="btn btn-primary btn-sm" data-action="add-vice-prompt">Начать</button><button class="btn btn-ghost btn-sm" data-action="dismiss-vice-intro">Не сейчас</button></div></div>';
+      html += '<div class="panel vice-intro"><div class="vice-intro-ic">⚠️</div><div class="vice-intro-body"><div class="vice-intro-title">Побороть вредную привычку?</div><div class="vice-intro-text">Курение, скролл, игры — отмечай каждый день. Раздел всегда в меню слева.</div></div><div class="vice-intro-actions"><button class="btn btn-primary btn-sm" data-action="add-vice-prompt">Начать</button><button class="btn btn-ghost btn-sm" data-action="dismiss-vice-intro">Не сейчас</button></div></div>';
     }
     const planToday = (state.weekPlan[todayWd]||{items:[]}).items.filter(function(i){ return i.icon!=="😴"; });
-    if(planToday.length){
+    const onceToday = oneOffTasksForWeekday(todayWd, todayWd);
+    if(planToday.length || onceToday.length){
       const prod = planProductivity(todayWd, todayK);
-      html += '<div class="panel plan-reminder" data-action="nav" data-screen="weekplan"><div class="plan-rem-ic">📅</div><div class="plan-rem-body"><div class="plan-rem-title">Сегодня по плану: ' + planToday.map(function(i){ return i.icon + " " + e(i.label); }).join(", ") + '</div><div class="plan-rem-sub">' + (prod.done>=prod.total && prod.total>0 ? "Всё выполнено 💪" : prod.done + " из " + prod.total) + '</div></div></div>';
+      const labels = planToday.map(function(i){ return i.icon + " " + e(i.label); })
+        .concat(onceToday.map(function(t){ return "⚡ " + e(t.text); }));
+      html += '<div class="panel plan-reminder" data-action="nav" data-screen="weekplan"><div class="plan-rem-ic">📅</div><div class="plan-rem-body"><div class="plan-rem-title">Сегодня по плану: ' + labels.join(", ") + '</div><div class="plan-rem-sub">' + (prod.done>=prod.total && prod.total>0 ? "Всё выполнено 💪" : prod.done + " из " + prod.total) + '</div></div></div>';
     }
     return html;
   }
@@ -799,7 +888,18 @@ window.LifeFeatures = (function(){
     if(kind==="add-exercise"){ addExerciseOpen=false; addExercise((fd.get("name")||"").toString().trim()); return true; }
     if(kind==="calc-1rm"){ calc1rm={ weight:Number(fd.get("weight"))||0, reps:Number(fd.get("reps"))||0 }; deps.render(); return true; }
     if(kind==="add-habit"){ addHabit((fd.get("text")||"").toString().trim(), parseRhythm((fd.get("rhythm")||"d1").toString())); return true; }
-    if(kind==="add-oneoff-task"){ addOneOffTask((fd.get("text")||"").toString().trim(), (fd.get("due")||"today").toString()); return true; }
+    if(kind==="add-oneoff-task"){
+      const text = (fd.get("text")||"").toString().trim();
+      const due = (fd.get("due")||"today").toString();
+      if(due.indexOf("wd:")===0) addOneOffTask(text, null, due.slice(3));
+      else addOneOffTask(text, due);
+      return true;
+    }
+    if(kind==="add-oneoff-on-day"){
+      addOneOffTask((fd.get("text")||"").toString().trim(), null, form.dataset.day);
+      planEditDay = Number(form.dataset.day);
+      return true;
+    }
     if(kind==="add-goal-linked"){
       const title = (fd.get("title")||"").toString().trim(); if(!title) return true;
       let link = { type:"manual" };
@@ -808,7 +908,8 @@ window.LifeFeatures = (function(){
       else if(dr.type==="cardio") link = { type:"cardio", metric:dr.metric||"minutes" };
       else if(dr.type==="books") link = { type:"books" };
       else if(dr.type==="vice" && dr.refId) link = { type:"vice", refId:dr.refId };
-      addGoalWithLink({ title:title, current: link.type==="manual"?Number(fd.get("current"))||0:0, target:fd.get("target")||1, unit:(fd.get("unit")||"").toString().trim(), link:link });
+      const unit = dr.type==="manual" ? (fd.get("unit")||"").toString().trim() : goalDefaultUnit(dr);
+      addGoalWithLink({ title:title, current: link.type==="manual"?Number(fd.get("current"))||0:0, target:fd.get("target")||1, unit:unit, link:link });
       goalLinkDraft = { type:"manual", refId:null, metric:"minutes" };
       return true;
     }
@@ -867,14 +968,15 @@ window.LifeFeatures = (function(){
   }
 
   function getSidebarExtras(state){
+    const ta = state.trackedAreas || {};
     return [
-      { key:"weekplan", icon:"📅", label:"План", show:state.trackedAreas.workouts },
-      { key:"vices", icon:"⚠️", label:"Вредные привычки", show:state.vices && state.vices.length>0 },
+      { key:"weekplan", icon:"📅", label:"План", show: !!(ta.tasks || ta.workouts) },
+      { key:"vices", icon:"⚠️", label:"Вредные привычки", show:true },
     ];
   }
 
   function getTopbarTitles(){
-    return { weekplan:"План недели", vices:"Вредные привычки" };
+    return { weekplan:"План и задачи", vices:"Вредные привычки" };
   }
 
   return {

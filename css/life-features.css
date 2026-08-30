@@ -149,6 +149,32 @@
   .plan-rem-title{ font-weight:700; font-size:14px; }
   .plan-rem-sub{ font-size:12px; color:var(--text-muted); margin-top:2px; }
 
+  .plan-once-panel{ margin-bottom:16px; display:flex; flex-direction:column; gap:12px; }
+  .plan-once-top-form{ margin:0; }
+  .plan-legend{ display:flex; flex-wrap:wrap; gap:14px; font-size:12px; color:var(--text-muted); }
+  .plan-legend-item{ display:inline-flex; align-items:center; gap:6px; }
+  .plan-legend-once{ color:var(--teal); }
+  .plan-item-once{
+    border-color:color-mix(in srgb, var(--teal) 42%, var(--border-soft));
+    background:color-mix(in srgb, var(--teal) 7%, var(--bg-elev-2));
+  }
+  .plan-item-once.done{ opacity:0.55; }
+  .plan-dot-once{ color:var(--teal); }
+  .plan-check-once.on{ background:var(--teal); border-color:var(--teal); }
+  .plan-once-tag{
+    flex:none;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--teal);
+    font-family:var(--font-mono);
+    opacity:0.9;
+  }
+  .plan-once-form-inline .plan-once-add-btn{ color:var(--teal); border-color:color-mix(in srgb, var(--teal) 35%, var(--border)); }
+  .plan-once-form-inline .plan-once-add-btn:hover{ border-color:var(--teal); background:color-mix(in srgb, var(--teal) 10%, transparent); }
+  .plan-hint{ margin-top:6px; }
+
   /* ---------- Vices (вредные привычки) ---------- */
   .vice-intro{ display:flex; align-items:center; gap:16px; margin-bottom:22px; border-left:3px solid var(--gold); flex-wrap:wrap; }
   .vice-intro-ic{ font-size:30px; flex:none; }

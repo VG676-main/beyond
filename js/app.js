@@ -1110,7 +1110,7 @@
   }
 
   function renderTopbar(){
-    const titles = { dashboard:'Дашборд', character:'Комната персонажа', workouts:'Тренировки', books:'Книги', tasks:'Задачи и привычки', goals:'Цели', achievements:'Достижения', friends:'Друзья' };
+    const titles = { dashboard:'Дашборд', character:'Комната персонажа', workouts:'Тренировки', books:'Книги', tasks:'Привычки', goals:'Цели', achievements:'Достижения', friends:'Друзья' };
     if(window.LifeFeatures) Object.assign(titles, LifeFeatures.getTopbarTitles());
     return '<header class="topbar"><h1>' + (titles[currentScreen]||'') + '</h1>' +
       '<div class="topbar-right">' +
@@ -1187,6 +1187,7 @@
     if(state.trackedAreas.workouts) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="workouts">💪 Тренировка</button>');
     if(state.trackedAreas.books) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="books">📖 Книга</button>');
     if(state.trackedAreas.tasks) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="tasks">✅ Привычки</button>');
+    if(state.trackedAreas.tasks || state.trackedAreas.workouts) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="weekplan">📅 План</button>');
     if(state.trackedAreas.goals) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="goals">🎯 Цель</button>');
     quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="character">🎭 Персонаж</button>');
 
@@ -1444,28 +1445,20 @@
     return spineMeasureCtx.measureText(text).width;
   }
 
-  function wrapTitleWords(title, fs, maxLinePx){
-    const words = String(title || '').trim().split(/\s+/).filter(Boolean);
-    if(!words.length) return [''];
-    const lines = [];
-    let cur = '';
-    for(let i = 0; i < words.length; i++){
-      const word = words[i];
-      const test = cur ? (cur + ' ' + word) : word;
-      if(measureSpineText(test, 700, fs) <= maxLinePx){
-        cur = test;
-      } else {
-        if(cur) lines.push(cur);
-        if(measureSpineText(word, 700, fs) > maxLinePx){
-          lines.push(word);
-          cur = '';
-        } else {
-          cur = word;
-        }
-      }
+  function truncateSpineText(text, maxPx, weight, fs){
+    const raw = String(text || '').trim();
+    if(!raw) return '';
+    const ell = '…';
+    if(measureSpineText(raw, weight, fs) <= maxPx) return raw;
+    let lo = 0;
+    let hi = raw.length;
+    while(lo < hi){
+      const mid = Math.ceil((lo + hi) / 2);
+      const slice = raw.slice(0, mid).replace(/\s+$/,'') + ell;
+      if(measureSpineText(slice, weight, fs) <= maxPx) lo = mid;
+      else hi = mid - 1;
     }
-    if(cur) lines.push(cur);
-    return lines;
+    return raw.slice(0, lo).replace(/\s+$/,'') + ell;
   }
 
   function measureShelfRowWidth(){
@@ -1576,29 +1569,27 @@
       const avail = Math.max(40, height - facePad);
       let authorFs = 0;
       let authorRun = 0;
+      let authorDisplay = '';
       if(author){
         authorFs = Math.min(fs - 0.5, narrow ? 8 : 9.5);
         if(authorFs < 6.5) authorFs = 6.5;
         const authorCap = Math.round(avail * 0.36);
-        let g = 0;
-        while(measureSpineText(author, 600, authorFs) * 1.12 > authorCap && authorFs > 6 && g++ < 24){
-          authorFs -= 0.5;
-        }
-        authorRun = Math.min(authorCap, measureSpineText(author, 600, authorFs) * 1.12 + (narrow ? 10 : 12));
+        authorDisplay = truncateSpineText(author, authorCap / 1.12, 600, authorFs);
+        authorRun = Math.min(authorCap, measureSpineText(authorDisplay, 600, authorFs) * 1.12 + (narrow ? 10 : 12));
       }
       const sepRun = author ? (narrow ? 14 : 16) : 0;
       const titleRun = Math.max(28, avail - authorRun - sepRun);
-      const lines = wrapTitleWords(title, fs, titleRun / 1.12);
+      const titleDisplay = truncateSpineText(title, titleRun / 1.12, 700, fs);
       const colW = fs * 1.3;
-      const faceNeed = Math.ceil(Math.max(1, lines.length) * colW + faceSidePad + edge);
-      const longest = lines.reduce(function(m, line){
-        return Math.max(m, measureSpineText(line, 700, fs) * 1.12);
-      }, 0);
+      const faceNeed = Math.ceil(colW + faceSidePad + edge);
+      const longest = measureSpineText(titleDisplay, 700, fs) * 1.12;
       return {
         authorFs: authorFs,
         authorRun: authorRun,
+        authorDisplay: authorDisplay,
         titleRun: titleRun,
-        lines: lines,
+        titleDisplay: titleDisplay,
+        lines: 1,
         faceNeed: faceNeed,
         fitsWidth: faceNeed <= maxW + 0.5,
         fitsLength: longest <= titleRun + 0.5
@@ -1634,13 +1625,14 @@
 
     return {
       title: title,
-      titleHtml: best.lines.map(function(line){ return esc(line); }).join('<br>'),
+      titleHtml: esc(best.titleDisplay),
       author: author,
+      authorHtml: best.authorDisplay ? esc(best.authorDisplay) : '',
       height: bookH,
       width: width,
       fs: Math.round(fs * 10) / 10,
       authorFs: Math.round(best.authorFs * 10) / 10,
-      lines: best.lines.length,
+      lines: 1,
       edge: edge
     };
   }
@@ -1659,13 +1651,13 @@
       '--edge-w:' + m.edge + 'px;' +
       paletteStyle;
     return '<button type="button" class="spine-book spine-v' + v +
-        (m.lines > 1 ? ' is-wrapped' : '') + (focused ? ' is-focused' : '') +
+        (focused ? ' is-focused' : '') +
         '" data-action="focus-shelf-book" data-id="' + book.id +
         '" title="' + esc(tip) + '" style="' + style + '">' +
         '<span class="spine-edge" aria-hidden="true"></span>' +
         '<span class="spine-face">' +
           '<span class="spine-title">' + m.titleHtml + '</span>' +
-          (m.author ? '<span class="spine-sep" aria-hidden="true"></span><span class="spine-author">' + esc(m.author) + '</span>' : '') +
+          (m.author ? '<span class="spine-sep" aria-hidden="true"></span><span class="spine-author">' + m.authorHtml + '</span>' : '') +
         '</span>' +
       '</button>';
   }
@@ -1696,10 +1688,13 @@
           '</div>'
         );
       }
-      const label = caseCount > 1 ? ('<div class="bookcase-label">Шкаф ' + (c + 1) + '</div>') : '';
+      const caption = caseCount > 1
+        ? ('<div class="bookcase-caption">Шкаф ' + (c + 1) + ' <span class="bookcase-caption-of">из ' + caseCount + '</span></div>')
+        : '';
       caseBlocks.push(
-        '<div class="bookcase">' +
-          label +
+        '<div class="bookcase-unit">' +
+          caption +
+          '<div class="bookcase">' +
           '<div class="bookcase-crown" aria-hidden="true"></div>' +
           '<div class="bookcase-body">' +
             '<div class="bookcase-rail is-left" aria-hidden="true"></div>' +
@@ -1707,7 +1702,7 @@
             '<div class="bookcase-rail is-right" aria-hidden="true"></div>' +
           '</div>' +
           '<div class="bookcase-base" aria-hidden="true"></div>' +
-        '</div>'
+        '</div></div>'
       );
     }
 
@@ -1930,8 +1925,7 @@
     const conditional = ['workouts','books','tasks','goals','weekplan','vices'];
     if(conditional.indexOf(currentScreen) !== -1){
       if(currentScreen === 'weekplan' || currentScreen === 'vices'){
-        if(currentScreen === 'vices' && !(state.vices && state.vices.length)) currentScreen = 'dashboard';
-        if(currentScreen === 'weekplan' && !state.trackedAreas.workouts) currentScreen = 'dashboard';
+        if(currentScreen === 'weekplan' && !(state.trackedAreas.tasks || state.trackedAreas.workouts)) currentScreen = 'dashboard';
       } else if(!state.trackedAreas[currentScreen]){
         currentScreen = 'dashboard';
       }

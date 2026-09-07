@@ -1,5 +1,5 @@
 /* BEYOND PWA — кэш оболочки. Прогресс в Firebase / localStorage. */
-const CACHE = "beyond-shell-v2";
+const CACHE = "beyond-shell-v3";
 
 function shellUrls() {
   const base = self.registration.scope;
@@ -12,11 +12,13 @@ function shellUrls() {
     base + "css/character.css",
     base + "css/books.css",
     base + "css/life-features.css",
+    base + "css/daybook.css",
     base + "js/main.js",
     base + "js/app.js",
     base + "js/cloud.js",
     base + "js/firebase-config.js",
     base + "js/life-features.js",
+    base + "js/daybook.js",
     base + "icons/icon-192.png",
     base + "icons/icon-512.png",
     base + "icons/icon-180.png",

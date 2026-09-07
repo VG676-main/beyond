@@ -520,29 +520,50 @@
   }
 
   function installLifeFeatures(){
-    if(!window.LifeFeatures) return;
-    LifeFeatures.install({
-      getState: function(){ return state; },
-      save: save,
-      render: render,
-      setScreen: function(screen){ currentScreen = screen; },
-      uid: uid,
-      todayKey: todayKey,
-      esc: esc,
-      segBar: segBar,
-      addStat: addStat,
-      addXp: addXp,
-      addSparks: addSparks,
-      logToday: logToday,
-      checkAchievements: checkAchievements,
-      showRewardMoment: showRewardMoment,
-      currentStatMax: currentStatMax,
-      levelTitle: levelTitle,
-      touchStreakForToday: touchStreakForToday,
-      toast: toast,
-      askConfirm: askConfirm,
-      maybeClaimHabitsBonus: maybeClaimHabitsBonus,
-    });
+    if(window.LifeFeatures){
+      LifeFeatures.install({
+        getState: function(){ return state; },
+        save: save,
+        render: render,
+        setScreen: function(screen){ currentScreen = screen; },
+        uid: uid,
+        todayKey: todayKey,
+        esc: esc,
+        segBar: segBar,
+        addStat: addStat,
+        addXp: addXp,
+        addSparks: addSparks,
+        logToday: logToday,
+        checkAchievements: checkAchievements,
+        showRewardMoment: showRewardMoment,
+        currentStatMax: currentStatMax,
+        levelTitle: levelTitle,
+        touchStreakForToday: touchStreakForToday,
+        toast: toast,
+        askConfirm: askConfirm,
+        maybeClaimHabitsBonus: maybeClaimHabitsBonus,
+      });
+    }
+    if(window.Daybook){
+      Daybook.install({
+        getState: function(){ return state; },
+        save: save,
+        render: render,
+        setScreen: function(screen){ currentScreen = screen; },
+        todayKey: todayKey,
+        esc: esc,
+        addStat: addStat,
+        addXp: addXp,
+        addSparks: addSparks,
+        logToday: logToday,
+        checkAchievements: checkAchievements,
+        showRewardMoment: showRewardMoment,
+        currentStatMax: currentStatMax,
+        toast: toast,
+        characterPortrait: characterPortrait,
+        dominantColor: dominantColor,
+      });
+    }
   }
 
   function newCharacterState(opts){
@@ -561,7 +582,10 @@
       books:[], tasks:[], goals:[], friends:[],
       records:{},
       unlockedAchievements:[], totalTasksCompleted:0, totalRecords:0,
-      streak:0, lastActiveDay:null,
+      streak:0, lastActiveDay:null, lastClosedDay:null,
+      journal:{}, stickers:{ owned:[], pinned:[], unlockedAt:{} },
+      profileTitle:'novice',
+      streakFreeze:{ week:null, used:0 },
       tasksResetDay: todayKey(),
       habitsBonusDay:null,
     };
@@ -574,6 +598,11 @@
     state.totalRecords = state.totalRecords ?? 0;
     state.streak = state.streak ?? 0;
     state.lastActiveDay = state.lastActiveDay ?? state.lastEndDay ?? null;
+    state.lastClosedDay = state.lastClosedDay ?? null;
+    state.journal = state.journal || {};
+    state.stickers = state.stickers || { owned:[], pinned:[], unlockedAt:{} };
+    state.profileTitle = state.profileTitle || 'novice';
+    state.streakFreeze = state.streakFreeze || { week:null, used:0 };
     state.records = state.records || {};
     state.todayLog = state.todayLog || [];
     state.friends = state.friends || [];
@@ -599,11 +628,17 @@
     state.level = levelFromXp(state.xp);
     state.stats = state.stats || { strength:0, endurance:0, intelligence:0, discipline:0 };
     ensureCosmeticsState();
-    reconcileStreak();
     if(window.LifeFeatures) LifeFeatures.migrate(state);
+    if(window.Daybook){
+      Daybook.migrate(state);
+      Daybook.reconcileFlame(state);
+    } else {
+      reconcileStreak();
+    }
   }
 
   function reconcileStreak(){
+    // Legacy fallback when Daybook is absent: streak follows last activity.
     if(!state || !state.lastActiveDay) return;
     const today = todayKey();
     if(state.lastActiveDay === today) return;
@@ -663,21 +698,10 @@
     }
   }
 
-  /* ============== Streak (honest, date-based) ============== */
+  /* ============== Activity touch (streak grows only via Daybook.closeDay) ============== */
   function touchStreakForToday(){
-    const today = todayKey();
-    if(state.lastActiveDay === today) return;
-    if(state.lastActiveDay === null){
-      state.streak = 1;
-    } else {
-      const last = new Date(state.lastActiveDay);
-      const now = new Date(today);
-      const diffDays = Math.round((now - last) / 86400000);
-      if(diffDays === 1) state.streak += 1;
-      else if(diffDays > 1) state.streak = 1;
-      else state.streak = state.streak || 1;
-    }
-    state.lastActiveDay = today;
+    // Marks today as active for logs/UI, but the flame streak advances only when the day is closed.
+    state.lastActiveDay = todayKey();
   }
 
   /* ============== Reward moment ============== */
@@ -771,12 +795,15 @@
   }
 
   function checkAchievements(){
+    let gained = false;
     activeAchievements(state).forEach(function(a){
       if(a.check(state) && state.unlockedAchievements.indexOf(a.id) === -1){
         state.unlockedAchievements.push(a.id);
+        gained = true;
         toast('Достижение: ' + a.title + ' ' + a.icon, 'achievement');
       }
     });
+    if(gained && window.Daybook) Daybook.onAchievementsChanged(state);
   }
 
   /* ============== Daily habits ============== */
@@ -816,8 +843,8 @@
     const sparks = addSparks(12);
     addXp(xp);
     touchStreakForToday();
-    logToday({ icon:'🌅', label:'День закрыт', detail:'Все привычки · +' + xp + ' XP · +' + sparks + ' ✦' });
-    toast('День закрыт! +' + xp + ' XP · +' + sparks + ' ✦', 'success');
+    logToday({ icon:'🌅', label:'Все привычки', detail:'Бонус дня · +' + xp + ' XP · +' + sparks + ' ✦' });
+    toast('Все привычки на сегодня! +' + xp + ' XP · +' + sparks + ' ✦', 'success');
     return { xp:xp, sparks:sparks };
   }
 
@@ -842,7 +869,7 @@
         xp:10, tier: lvl.leveledUp ? 'levelup' : 'normal',
         message: lvl.leveledUp
           ? ('Уровень ' + lvl.newLevel + '! ' + levelTitle(lvl.newLevel))
-          : (bonus ? ('Привычка + день закрыт! +' + bonus.sparks + ' ✦ бонус') : ('Готово. +' + sparks + ' искр.'))
+          : (bonus ? ('Привычка + все привычки! +' + bonus.sparks + ' ✦ бонус') : ('Готово. +' + sparks + ' искр.'))
       });
     }
     checkAchievements();
@@ -1083,6 +1110,7 @@
   function renderSidebar(){
     const items = [
       { key:'dashboard',     icon:'🏠', label:'Дашборд',     show:true },
+      { key:'profile',       icon:'🪞', label:'Витрина',     show:true },
       { key:'character',     icon:'🎭', label:'Персонаж',    show:true },
       { key:'workouts',      icon:'💪', label:'Тренировки',  show:state.trackedAreas.workouts },
       { key:'books',         icon:'📖', label:'Книги',        show:state.trackedAreas.books },
@@ -1103,18 +1131,20 @@
     return '<aside class="sidebar">' +
       '<div class="sidebar-top">' + hexAvatar(state.character.name, 50, dominantColor()) +
         '<div><div class="sidebar-name">' + esc(state.character.name) + '</div>' +
-        '<div class="sidebar-level">Ур. ' + state.level + ' · ' + levelTitle(state.level) + '</div>' +
-        '<div class="sidebar-level" style="margin-top:3px;color:var(--gold);">✦ ' + (state.sparks||0) + '</div></div></div>' +
+        '<div class="sidebar-level">Ур. ' + state.level + ' · ' + (window.Daybook ? Daybook.titleName(state) : levelTitle(state.level)) + '</div>' +
+        '<div class="sidebar-level" style="margin-top:3px;color:var(--gold);">✦ ' + (state.sparks||0) + ' · 🔥 ' + (state.streak||0) + '</div></div></div>' +
       '<nav class="sidebar-nav">' + navHtml + '</nav>' +
     '</aside>';
   }
 
   function renderTopbar(){
-    const titles = { dashboard:'Дашборд', character:'Комната персонажа', workouts:'Тренировки', books:'Книги', tasks:'Привычки', goals:'Цели', achievements:'Достижения', friends:'Друзья' };
+    const titles = { dashboard:'Дашборд', profile:'Витрина', character:'Комната персонажа', workouts:'Тренировки', books:'Книги', tasks:'Привычки', goals:'Цели', achievements:'Достижения', friends:'Друзья' };
     if(window.LifeFeatures) Object.assign(titles, LifeFeatures.getTopbarTitles());
+    if(window.Daybook) Object.assign(titles, Daybook.getTopbarTitles());
     return '<header class="topbar"><h1>' + (titles[currentScreen]||'') + '</h1>' +
       '<div class="topbar-right">' +
       '<span class="sparks-chip" title="Искры — валюта персонажа"><span class="sparks-ico">✦</span>' + (state.sparks||0) + '</span>' +
+      '<span class="sparks-chip flame-chip" title="Серия закрытых дней">🔥 ' + (state.streak||0) + '</span>' +
       (!persistAvailable ? '<span class="badge badge-warn">Без сохранения</span>' : '') +
       '<button class="btn-icon btn-settings" data-action="open-settings" title="Настройки" aria-label="Настройки">⚙️</button>' +
       '</div></header>';
@@ -1161,7 +1191,7 @@
               '<div><h2>Сегодня</h2><p class="screen-sub">Привычки по ритму — закрой запланированные на сегодня</p></div>' +
               '<div class="today-focus-meta">' +
                 '<span class="today-count">' + prog.done + ' / ' + prog.total + '</span>' +
-                (prog.complete ? '<span class="badge badge-done">День закрыт</span>' : '') +
+                (prog.complete ? '<span class="badge badge-done">привычки ✓</span>' : '') +
               '</div>' +
             '</div>' +
             segBar(prog.done, prog.total || 1, '--gold', Math.max(prog.total, 4)) +
@@ -1189,23 +1219,31 @@
     if(state.trackedAreas.tasks) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="tasks">✅ Привычки</button>');
     if(state.trackedAreas.tasks || state.trackedAreas.workouts) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="weekplan">📅 План</button>');
     if(state.trackedAreas.goals) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="goals">🎯 Цель</button>');
+    quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="profile">🪞 Витрина</button>');
     quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="character">🎭 Персонаж</button>');
+
+    const titleLine = window.Daybook ? Daybook.titleName(state) : levelTitle(lvl);
+    const flame = window.Daybook ? Daybook.flameTier(state.streak||0) : { emoji:'🔥', label:'' };
+    const dayClosed = !!(state.journal && state.journal[todayKey()] && state.journal[todayKey()].closed);
 
     return '' +
     '<div class="panel dash-hero">' +
       '<div class="dash-avatar-block">' + hexAvatar(c.name, 84, dominantColor()) +
-        '<div><div class="dash-name">' + esc(c.name) + '</div><div class="dash-title">' + levelTitle(lvl) + ' · Уровень ' + lvl + '</div>' +
-        '<div class="dash-title" style="margin-top:6px;">✦ ' + (state.sparks||0) + ' ' + pluralRu(state.sparks||0, 'искра', 'искры', 'искр') + ' · 🔥 ' + state.streak + '</div></div></div>' +
+        '<div><div class="dash-name">' + esc(c.name) + '</div><div class="dash-title">' + esc(titleLine) + ' · Уровень ' + lvl + '</div>' +
+        '<div class="dash-title" style="margin-top:6px;">✦ ' + (state.sparks||0) + ' ' + pluralRu(state.sparks||0, 'искра', 'искры', 'искр') +
+          ' · ' + flame.emoji + ' ' + (state.streak||0) + (dayClosed ? ' · день закрыт' : ' · закрой день') + '</div></div></div>' +
       '<div class="dash-xp"><div class="xp-row"><span>Опыт до следующего уровня</span><span>' + xpIntoLevel + ' / ' + xpNeeded + ' XP</span></div>' +
         segBar(xpIntoLevel, xpNeeded, '--gold', 18) +
         '<div class="xp-total">Всего опыта: ' + state.xp + '</div></div>' +
     '</div>' +
+    (window.Daybook ? Daybook.renderDaySpread() : '') +
     (window.LifeFeatures ? LifeFeatures.renderDashboardExtras() : '') +
     todayFocus +
     '<div class="stat-grid">' + statsHtml + '</div>' +
     '<div class="dash-grid">' +
       '<div class="panel today-panel"><div class="panel-head"><h3>Активность</h3></div>' +
-        activityHtml + '<div class="streak-row">🔥 Серия дней: <strong>' + state.streak + '</strong>' + (state.lastActiveDay===todayKey() ? ' · сегодня активность есть' : '') + '</div></div>' +
+        activityHtml + '<div class="streak-row">' + flame.emoji + ' Серия закрытых дней: <strong>' + (state.streak||0) + '</strong>' +
+          (dayClosed ? ' · сегодня закрыт' : ' · сегодня ещё открыт') + '</div></div>' +
       '<div class="panel quick-panel"><h3 style="margin-bottom:12px;">Быстрые действия</h3><div class="quick-actions">' + quickItems.join('') + '</div></div>' +
     '</div>';
   }
@@ -1366,7 +1404,7 @@
       '<div class="char-stage">' +
         characterPortrait({ size:120, name:state.character.name, glowColor:dominantColor() }) +
         '<div class="char-stage-name">' + esc(state.character.name) + '</div>' +
-        '<div class="char-stage-meta">' + levelTitle(state.level) + ' · Ур. ' + state.level + ' · ✦ ' + (state.sparks||0) + '</div>' +
+        '<div class="char-stage-meta">' + (window.Daybook ? Daybook.titleName(state) : levelTitle(state.level)) + ' · Ур. ' + state.level + ' · ✦ ' + (state.sparks||0) + '</div>' +
         '<div class="char-stage-loadout">' +
           '<span class="loadout-pill">' + (photo ? 'Фото' : esc(avatar.name)) + '</span>' +
           '<span class="loadout-pill">' + esc((getCosmetic(eq.shape)||{}).name || 'Грань') + '</span>' +
@@ -1374,6 +1412,7 @@
           '<span class="loadout-pill">' + esc(aura ? aura.name : '—') + '</span>' +
           '<span class="loadout-pill">' + esc(badge ? badge.name : '—') + '</span>' +
         '</div>' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-action="nav" data-screen="profile" style="margin-top:12px;">Открыть витрину →</button>' +
       '</div>' +
       '<div class="char-tabs">' + tabsHtml + '</div>' +
       '<div class="panel">' + body + '</div>' +
@@ -1901,6 +1940,7 @@
   /* ============== Render: root ============== */
   function renderScreenContent(){
     switch(currentScreen){
+      case 'profile': return window.Daybook ? Daybook.renderProfileShowcase() : renderCharacter();
       case 'character': return renderCharacter();
       case 'workouts': return renderWorkouts();
       case 'books': return renderBooks();
@@ -1940,6 +1980,7 @@
       (window.LifeFeatures ? LifeFeatures.renderExtraModals() : '') +
       renderConfirmModal();
     if(window.LifeFeatures) LifeFeatures.afterRender();
+    if(window.Daybook) Daybook.afterRender();
     reflowBookshelfIfNeeded();
   }
 
@@ -2044,6 +2085,7 @@
       if(!el) return;
       const action = el.dataset.action;
       const id = el.dataset.id;
+      if(window.Daybook && Daybook.handleAction(action, el, id)) return;
       if(window.LifeFeatures && LifeFeatures.handleAction(action, el, id)) return;
       switch(action){
         case 'nav':

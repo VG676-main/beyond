@@ -43,16 +43,30 @@
     { id:'storm',    name:'Шторм',    icon:'⛈️', swatchA:'#6b8cae', swatchB:'#1a2330' },
     { id:'berry',    name:'Ягода',    icon:'🫐', swatchA:'#C33764', swatchB:'#1D2671' },
     { id:'redjohn',  name:'Red John', icon:'🩸', swatchA:'#8b0000', swatchB:'#000000', secret:true },
+    { id:'surf',     name:'Серф',     icon:'🏝️', swatchA:'#f4a261', swatchB:'#0284c7', secret:true },
+    { id:'acid',     name:'Гламур',   icon:'💅', swatchA:'#ff00aa', swatchB:'#ff66ee', secret:true },
   ];
 
   const THEME_FX = {
-    sakura:   { kind:'emoji', glyph:'🌸', count:14 },
+    sakura:   { kind:'emoji', glyph:'🌸', count:14, poppable:true },
     graphite: { kind:'ash', count:18 },
-    depth:    { kind:'bubble', count:22 },
+    depth:    { kind:'bubble', count:22, poppable:true },
     storm:    { kind:'rain', count:42 },
     berry:    { kind:'ash', count:12 },
     redjohn:  { kind:'drip', count:16 },
+    surf:     { kind:'scene', scene:'surf' },
+    acid:     { kind:'emoji', glyph:'✦', count:20 },
   };
+
+  const ALL_SECRET_IDS = [
+    'redjohn','redjohn_palette','frame_redjohn','aura_redjohn','badge_redjohn',
+    'surf','frame_surf','aura_surf','badge_surf','shape_wave','badge_bubble',
+    'acid','frame_acid','aura_acid','badge_acid','shape_petal',
+    'shape_star','frame_storm','aura_neon','badge_storm',
+    'promo_aikraam'
+  ];
+
+  const PROMO_CODE = 'AIKRAAM';
 
   const AVATARS = [
     { id:'atlas',   name:'Атлас',   skin:'atlas',   glyph:null,  blurb:'Классика — твои инициалы' },
@@ -70,19 +84,30 @@
     { id:'shape_rounded',  slot:'shape', name:'Скругление',  price:0, style:'rounded',  free:true, blurb:'Мягкий квадрат' },
     { id:'shape_diamond',  slot:'shape', name:'Ромб',        price:0, style:'diamond',  free:true, blurb:'Острый силуэт' },
     { id:'shape_shield',   slot:'shape', name:'Щит',         price:0, style:'shield',   free:true, blurb:'Геральдическая форма' },
+    { id:'shape_wave',     slot:'shape', name:'Волна',       price:0, style:'wave',     secret:'shape_wave', free:true, blurb:'Открой тему Серф — лопни 10 пузырей в Глубине' },
+    { id:'shape_star',     slot:'shape', name:'Звезда',      price:0, style:'star',     secret:'shape_star', free:true, blurb:'Достигни 5 уровня' },
+    { id:'shape_petal',    slot:'shape', name:'Лепесток',    price:0, style:'petal',    secret:'shape_petal', free:true, blurb:'Открой тему Гламур — поймай 12 лепестков Сакуры' },
 
     { id:'frame_none',     slot:'frame', name:'Без рамки',       price:0,  style:'none',     free:true },
     { id:'frame_gold',     slot:'frame', name:'Золотая грань',   price:45, style:'gold' },
     { id:'frame_ice',      slot:'frame', name:'Ледяной контур',  price:45, style:'ice' },
     { id:'frame_obsidian', slot:'frame', name:'Обсидиановый',    price:60, style:'obsidian' },
     { id:'frame_bloom',    slot:'frame', name:'Цветение',        price:55, style:'bloom' },
+    { id:'frame_redjohn',  slot:'frame', name:'Улыбка Джона',    price:0,  style:'redjohn', secret:'frame_redjohn', free:true, blurb:'Закрой день в теме Red John' },
+    { id:'frame_surf',     slot:'frame', name:'Горизонт',        price:0,  style:'surf',    secret:'frame_surf', free:true, blurb:'Закрой день в теме Серф' },
+    { id:'frame_acid',     slot:'frame', name:'Гламурный контур', price:0,  style:'acid',    secret:'frame_acid', free:true, blurb:'Закрой день в теме Гламур' },
+    { id:'frame_storm',    slot:'frame', name:'Грозовая дуга',   price:0,  style:'storm',   secret:'frame_storm', free:true, blurb:'Закрой день в теме Шторм' },
 
     { id:'aura_none',  slot:'aura', name:'Без ауры',     price:0,  style:'none',  free:true },
-    { id:'aura_soft',  slot:'aura', name:'Мягкое сияние', price:35, style:'soft',  blurb:'Лёгкое свечение по контуру' },
+    { id:'aura_soft',  slot:'aura', name:'Мягкое сияние', price:35, style:'soft',  blurb:'Яркое мягкое свечение по контуру' },
     { id:'aura_ember', slot:'aura', name:'Угли',         price:70, style:'ember', blurb:'Тёплое огненное марево' },
     { id:'aura_tide',  slot:'aura', name:'Прилив',       price:70, style:'tide',  blurb:'Холодный бирюзовый ореол' },
     { id:'aura_void',  slot:'aura', name:'Пустота',      price:65, style:'void',  blurb:'Тёмное ядро и фиолетовый край' },
     { id:'aura_berry', slot:'aura', name:'Ягодный свет', price:80, style:'berry', blurb:'Розово-фиолетовый ореол' },
+    { id:'aura_redjohn', slot:'aura', name:'Кровавое сияние', price:0, style:'redjohn', secret:'aura_redjohn', free:true, blurb:'Закрой день 3 раза в теме Red John' },
+    { id:'aura_surf',  slot:'aura', name:'Солнечный блик', price:0, style:'surf', secret:'aura_surf', free:true, blurb:'Закрой день 3 раза в теме Серф' },
+    { id:'aura_acid',  slot:'aura', name:'Гламурное сияние', price:0, style:'acid', secret:'aura_acid', free:true, blurb:'Закрой день 3 раза в теме Гламур' },
+    { id:'aura_neon',  slot:'aura', name:'Кибер-ореол',  price:0, style:'neon', secret:'aura_neon', free:true, blurb:'Запиши тренировку в теме Неон' },
 
     { id:'badge_none',   slot:'badge', name:'Без значка',  price:0,  icon:'',  free:true },
     { id:'badge_star',   slot:'badge', name:'Звезда',      price:30, icon:'⭐' },
@@ -90,11 +115,16 @@
     { id:'badge_leaf',   slot:'badge', name:'Лист',        price:35, icon:'🍃' },
     { id:'badge_bolt',   slot:'badge', name:'Разряд',      price:45, icon:'⚡' },
     { id:'badge_crown',  slot:'badge', name:'Корона',      price:90, icon:'👑' },
+    { id:'badge_redjohn', slot:'badge', name:'Метка',      price:0,  icon:'☠', secret:'badge_redjohn', free:true, blurb:'Заверши книгу Red John · 41' },
+    { id:'badge_surf',   slot:'badge', name:'Доска',       price:0,  icon:'🏄', secret:'badge_surf', free:true, blurb:'Открой тему Серф' },
+    { id:'badge_acid',   slot:'badge', name:'Пульс',       price:0,  icon:'💖', secret:'badge_acid', free:true, blurb:'Открой тему Гламур' },
+    { id:'badge_bubble', slot:'badge', name:'Пузырь',      price:0,  icon:'🫧', secret:'badge_bubble', free:true, blurb:'Лопни 10 пузырей в Глубине' },
+    { id:'badge_storm',  slot:'badge', name:'Молния',      price:0,  icon:'⚡', secret:'badge_storm', free:true, blurb:'Закрой день в теме Шторм' },
   ];
 
   function defaultOwnedCosmetics(){
     return AVATARS.map(function(a){ return a.id; }).concat(
-      COSMETICS.filter(function(c){ return c.free; }).map(function(c){ return c.id; })
+      COSMETICS.filter(function(c){ return c.free && !c.secret; }).map(function(c){ return c.id; })
     );
   }
 
@@ -114,6 +144,7 @@
   let lastAppliedTheme = null;
   let lastFxSignature = null;
   let charRoomTab = 'avatars';
+  let profileTab = 'vitrine';
   let shelfBookFocus = null;
   let cloudSaveTimer = null;
   let shelfPackWidthOverride = null;
@@ -189,8 +220,32 @@
   function buildThemeFx(theme){
     const fx = THEME_FX[theme];
     if(!fx) return '';
+    if(fx.kind === 'scene' && fx.scene === 'surf'){
+      return '' +
+        '<div class="surf-scene surf-scene-bali" aria-hidden="true">' +
+          '<div class="surf-ocean"></div>' +
+          '<div class="surf-foam"></div>' +
+          '<div class="surf-wave-sheet"></div>' +
+          '<span class="surf-dot d1"></span><span class="surf-dot d2"></span><span class="surf-dot d3"></span>' +
+          '<span class="surf-dot d4"></span><span class="surf-dot d5"></span><span class="surf-dot d6"></span>' +
+          '<div class="surf-pill">★ НА БАЛИ</div>' +
+          '<div class="surf-word">surfing</div>' +
+          '<div class="surf-banner">ПОЙМАЙ ВОЛНУ · ЖИВИ НА ГРАНИ · СЕРФ КАК СТИЛЬ</div>' +
+          '<div class="surf-collage">' +
+            '<div class="surf-tile t-palm"></div>' +
+            '<div class="surf-tile t-ride"></div>' +
+            '<div class="surf-tile t-shop"></div>' +
+            '<div class="surf-tile t-cove"></div>' +
+          '</div>' +
+          '<div class="surf-boards">' +
+            '<span class="sb sb1"></span><span class="sb sb2"></span><span class="sb sb3"></span>' +
+            '<span class="sb sb4"></span><span class="sb sb5"></span>' +
+          '</div>' +
+        '</div>';
+    }
     let html = '';
     const n = fx.count || 12;
+    const poppable = !!fx.poppable;
     for(let i=0;i<n;i++){
       const left = (Math.random()*100).toFixed(1);
       const delay = (Math.random() * (fx.kind==='rain' ? 3 : 14)).toFixed(1);
@@ -199,7 +254,9 @@
         const duration = (8 + Math.random()*10).toFixed(1);
         const size = (12 + Math.random()*12).toFixed(0);
         const opacity = (0.35 + Math.random()*0.45).toFixed(2);
-        html += '<span class="fx-particle fx-petal" style="left:' + left + '%; animation-duration:' + duration + 's; animation-delay:-' + delay + 's; --drift:' + drift + 'px; font-size:' + size + 'px; opacity:' + opacity + ';">' + fx.glyph + '</span>';
+        const popCls = poppable ? ' fx-poppable' : '';
+        const popAttr = poppable ? ' data-action="catch-petal" role="button" tabindex="-1"' : '';
+        html += '<span class="fx-particle fx-petal' + popCls + '" style="left:' + left + '%; animation-duration:' + duration + 's; animation-delay:-' + delay + 's; --drift:' + drift + 'px; font-size:' + size + 'px; opacity:' + opacity + ';"' + popAttr + '>' + fx.glyph + '</span>';
       } else if(fx.kind === 'ash'){
         const duration = (9 + Math.random()*10).toFixed(1);
         const size = (2 + Math.random()*3.5).toFixed(1);
@@ -214,7 +271,9 @@
         const duration = (10 + Math.random()*12).toFixed(1);
         const size = (6 + Math.random()*16).toFixed(0);
         const opacity = (0.18 + Math.random()*0.35).toFixed(2);
-        html += '<span class="fx-particle fx-bubble" style="left:' + left + '%; width:' + size + 'px; height:' + size + 'px; animation-duration:' + duration + 's; animation-delay:-' + delay + 's; --drift:' + drift + 'px; opacity:' + opacity + ';"></span>';
+        const popCls = poppable ? ' fx-poppable' : '';
+        const popAttr = poppable ? ' data-action="pop-bubble" role="button" tabindex="-1"' : '';
+        html += '<span class="fx-particle fx-bubble' + popCls + '" style="left:' + left + '%; width:' + size + 'px; height:' + size + 'px; animation-duration:' + duration + 's; animation-delay:-' + delay + 's; --drift:' + drift + 'px; opacity:' + opacity + ';"' + popAttr + '></span>';
       } else if(fx.kind === 'drip'){
         const duration = (4 + Math.random()*5).toFixed(1);
         const h = (18 + Math.random()*36).toFixed(0);
@@ -228,33 +287,91 @@
   function applyTheme(force){
     const theme = state ? (state.theme || 'obsidian') : 'obsidian';
     const animOn = isThemeAnimOn(theme);
-    const fxSig = theme + ':' + (animOn ? 'on' : 'off');
+    const vivid = !!(state && isSecretThemeUnlocked('redjohn_palette'));
+    const fxSig = theme + ':' + (animOn ? 'on' : 'off') + ':' + (vivid ? 'vivid' : 'base');
     if(!force && theme === lastAppliedTheme && fxSig === lastFxSignature) return;
     lastAppliedTheme = theme;
     lastFxSignature = fxSig;
     document.documentElement.setAttribute('data-theme', theme);
+    if(theme === 'redjohn' && vivid) document.documentElement.setAttribute('data-rj-palette', 'vivid');
+    else document.documentElement.removeAttribute('data-rj-palette');
     const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if(metaTheme) metaTheme.setAttribute('content', theme === 'redjohn' ? '#000000' : (theme === 'sakura' ? '#fdf2f5' : '#0b0e14'));
-    const layer = document.getElementById('petal-layer');
-    if(!layer) return;
-    layer.innerHTML = '';
-    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(theme === 'redjohn'){
-      layer.innerHTML =
-        '<div class="rj-mark" aria-hidden="true">' +
-          '<img class="rj-mark-img" src="./icons/red-john.png" alt="">' +
-        '</div>';
+    if(metaTheme){
+      const colors = { redjohn:'#000000', sakura:'#fdf2f5', surf:'#38bdf8', acid:'#ff00aa' };
+      metaTheme.setAttribute('content', colors[theme] || '#0b0e14');
     }
-    if(animOn && !reduceMotion && THEME_FX[theme]){
-      layer.innerHTML += buildThemeFx(theme);
+    const atmo = document.getElementById('atmosphere-layer');
+    const layer = document.getElementById('petal-layer');
+    if(atmo) atmo.innerHTML = '';
+    if(layer) layer.innerHTML = '';
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const allowFx = animOn && (!reduceMotion || theme === 'redjohn' || theme === 'surf' || theme === 'depth' || theme === 'sakura');
+    if(allowFx) document.documentElement.setAttribute('data-fx', 'on');
+    else document.documentElement.removeAttribute('data-fx');
+
+    // Behind UI: Red John mark / Surf scene
+    if(atmo){
+      if(theme === 'redjohn'){
+        atmo.innerHTML =
+          '<div class="rj-mark" aria-hidden="true">' +
+            '<img class="rj-mark-img" src="./icons/red-john.png" alt="">' +
+          '</div>';
+      } else if(theme === 'surf'){
+        atmo.innerHTML = buildThemeFx('surf');
+      }
+    }
+
+    // Above UI gaps: particles (bubbles/petals clickable)
+    if(layer && allowFx && THEME_FX[theme] && THEME_FX[theme].kind !== 'scene'){
+      layer.innerHTML = buildThemeFx(theme);
     }
   }
 
   function ensureSecrets(){
     if(!state) return;
-    state.secrets = state.secrets || { themeSwaps:0, unlocked:[] };
+    state.secrets = state.secrets || {};
     if(state.secrets.themeSwaps == null) state.secrets.themeSwaps = 0;
+    if(state.secrets.redjohnLeaves == null) state.secrets.redjohnLeaves = 0;
+    if(state.secrets.rjCloseDays == null) state.secrets.rjCloseDays = 0;
+    if(state.secrets.bubblesPopped == null) state.secrets.bubblesPopped = 0;
+    if(state.secrets.petalsCaught == null) state.secrets.petalsCaught = 0;
+    if(state.secrets.surfCloseDays == null) state.secrets.surfCloseDays = 0;
+    if(state.secrets.acidCloseDays == null) state.secrets.acidCloseDays = 0;
+    if(state.secrets.stormCloseDays == null) state.secrets.stormCloseDays = 0;
     state.secrets.unlocked = state.secrets.unlocked || [];
+  }
+
+  function isSecretThemeUnlocked(id){
+    ensureSecrets();
+    return state.secrets.unlocked.indexOf(id) !== -1;
+  }
+
+  function grantSecretUnlock(id, toastMsg, logLabel){
+    ensureSecrets();
+    if(isSecretThemeUnlocked(id)) return false;
+    state.secrets.unlocked.push(id);
+    const cosmeticPrefixes = ['frame_','aura_','badge_','shape_'];
+    const isCosmetic = cosmeticPrefixes.some(function(p){ return id.indexOf(p)===0; });
+    if(isCosmetic){
+      state.cosmetics = state.cosmetics || { owned:[], equipped: defaultEquipped(), photos:[] };
+      state.cosmetics.owned = state.cosmetics.owned || [];
+      if(state.cosmetics.owned.indexOf(id) === -1) state.cosmetics.owned.push(id);
+    }
+    // Theme unlocks often come with starter cosmetics
+    if(id === 'surf'){
+      grantSecretUnlock('shape_wave');
+      grantSecretUnlock('badge_surf');
+      grantSecretUnlock('badge_bubble');
+    }
+    if(id === 'acid'){
+      grantSecretUnlock('shape_petal');
+      grantSecretUnlock('badge_acid');
+    }
+    if(toastMsg) toast(toastMsg, 'achievement');
+    if(logLabel) logToday({ icon:'✦', label:logLabel, detail:'секрет разблокирован' });
+    lastAppliedTheme = null;
+    lastFxSignature = null;
+    return true;
   }
 
   function syncSecretUnlocks(quiet){
@@ -264,33 +381,81 @@
       return b && isRedJohnBook(b.title, b.author);
     });
     if(hasBook && !isSecretThemeUnlocked('redjohn')){
-      if(quiet){
-        state.secrets.unlocked.push('redjohn');
-        changed = true;
-      } else {
-        unlockRedJohn('book');
-        changed = true;
-      }
+      if(quiet){ state.secrets.unlocked.push('redjohn'); changed = true; }
+      else { unlockRedJohn('book'); changed = true; }
     }
     if((state.secrets.themeSwaps || 0) >= 10 && !isSecretThemeUnlocked('redjohn')){
+      if(quiet){ state.secrets.unlocked.push('redjohn'); changed = true; }
+      else { unlockRedJohn('swaps'); changed = true; }
+    }
+    if((state.secrets.redjohnLeaves || 0) >= 10 && !isSecretThemeUnlocked('redjohn_palette')){
+      if(quiet){ state.secrets.unlocked.push('redjohn_palette'); changed = true; }
+      else { grantSecretUnlock('redjohn_palette', 'Расцветка Red John открыта — кровь насыщеннее.', 'Расцветка Red John'); changed = true; }
+    }
+    if((state.secrets.rjCloseDays || 0) >= 1 && !isSecretThemeUnlocked('frame_redjohn')){
+      if(quiet){ state.secrets.unlocked.push('frame_redjohn'); if(state.cosmetics.owned.indexOf('frame_redjohn')<0) state.cosmetics.owned.push('frame_redjohn'); changed = true; }
+      else { grantSecretUnlock('frame_redjohn', 'Рамка «Улыбка Джона» разблокирована.', 'Рамка Red John'); changed = true; }
+    }
+    if((state.secrets.rjCloseDays || 0) >= 3 && !isSecretThemeUnlocked('aura_redjohn')){
+      if(quiet){ state.secrets.unlocked.push('aura_redjohn'); if(state.cosmetics.owned.indexOf('aura_redjohn')<0) state.cosmetics.owned.push('aura_redjohn'); changed = true; }
+      else { grantSecretUnlock('aura_redjohn', 'Аура «Кровавое сияние» разблокирована.', 'Аура Red John'); changed = true; }
+    }
+    const rjDone = (state.books || []).some(function(b){
+      return b && isRedJohnBook(b.title, b.author) && b.status === 'done';
+    });
+    if(rjDone && !isSecretThemeUnlocked('badge_redjohn')){
+      if(quiet){ state.secrets.unlocked.push('badge_redjohn'); if(state.cosmetics.owned.indexOf('badge_redjohn')<0) state.cosmetics.owned.push('badge_redjohn'); changed = true; }
+      else { grantSecretUnlock('badge_redjohn', 'Значок «Метка» разблокирован.', 'Значок Red John'); changed = true; }
+    }
+    if((state.secrets.bubblesPopped || 0) >= 10 && !isSecretThemeUnlocked('surf')){
       if(quiet){
-        state.secrets.unlocked.push('redjohn');
+        ['surf','shape_wave','badge_surf','badge_bubble'].forEach(function(id){
+          if(state.secrets.unlocked.indexOf(id) === -1) state.secrets.unlocked.push(id);
+        });
         changed = true;
-      } else {
-        unlockRedJohn('swaps');
+      } else { unlockSurfTheme(); changed = true; }
+    }
+    if((state.secrets.petalsCaught || 0) >= 12 && !isSecretThemeUnlocked('acid')){
+      if(quiet){
+        ['acid','shape_petal','badge_acid'].forEach(function(id){
+          if(state.secrets.unlocked.indexOf(id) === -1) state.secrets.unlocked.push(id);
+        });
         changed = true;
-      }
+      } else { unlockAcidTheme(); changed = true; }
+    }
+    if((state.level || 1) >= 5 && !isSecretThemeUnlocked('shape_star')){
+      if(quiet){ state.secrets.unlocked.push('shape_star'); if(state.cosmetics.owned.indexOf('shape_star')<0) state.cosmetics.owned.push('shape_star'); changed = true; }
+      else { grantSecretUnlock('shape_star', 'Форма «Звезда» открыта — 5 уровень.', 'Форма Звезда'); changed = true; }
+    }
+    if((state.secrets.surfCloseDays || 0) >= 1 && !isSecretThemeUnlocked('frame_surf')){
+      grantSecretUnlock('frame_surf', quiet ? null : 'Рамка «Горизонт» открыта.', quiet ? null : 'Рамка Серф'); changed = true;
+    }
+    if((state.secrets.surfCloseDays || 0) >= 3 && !isSecretThemeUnlocked('aura_surf')){
+      grantSecretUnlock('aura_surf', quiet ? null : 'Аура «Солнечный блик» открыта.', quiet ? null : 'Аура Серф'); changed = true;
+    }
+    if((state.secrets.acidCloseDays || 0) >= 1 && !isSecretThemeUnlocked('frame_acid')){
+      grantSecretUnlock('frame_acid', quiet ? null : 'Рамка «Гламурный контур» открыта.', quiet ? null : 'Рамка Гламур'); changed = true;
+    }
+    if((state.secrets.acidCloseDays || 0) >= 3 && !isSecretThemeUnlocked('aura_acid')){
+      grantSecretUnlock('aura_acid', quiet ? null : 'Аура «Гламурное сияние» открыта.', quiet ? null : 'Аура Гламур'); changed = true;
+    }
+    if((state.secrets.stormCloseDays || 0) >= 1){
+      if(!isSecretThemeUnlocked('frame_storm')){ grantSecretUnlock('frame_storm', quiet ? null : 'Рамка «Грозовая дуга» открыта.', quiet ? null : 'Рамка Шторм'); changed = true; }
+      if(!isSecretThemeUnlocked('badge_storm')){ grantSecretUnlock('badge_storm', quiet ? null : 'Значок «Молния» открыт.', quiet ? null : 'Значок Шторм'); changed = true; }
     }
     if(state.theme === 'redjohn' && !isSecretThemeUnlocked('redjohn')){
       state.secrets.unlocked.push('redjohn');
       changed = true;
     }
+    if(state.theme === 'surf' && !isSecretThemeUnlocked('surf')){
+      state.secrets.unlocked.push('surf');
+      changed = true;
+    }
+    if(state.theme === 'acid' && !isSecretThemeUnlocked('acid')){
+      state.secrets.unlocked.push('acid');
+      changed = true;
+    }
     return changed;
-  }
-
-  function isSecretThemeUnlocked(id){
-    ensureSecrets();
-    return state.secrets.unlocked.indexOf(id) !== -1;
   }
 
   function visibleThemes(){
@@ -316,10 +481,28 @@
     lastAppliedTheme = null;
     lastFxSignature = null;
     const msg = reason === 'book'
-      ? 'Книга найдена. Он улыбается.'
-      : 'Десять раз сменил маску. Red John открыт.';
+      ? 'Книга найдена. Тема Red John открыта.'
+      : 'Десять смен оформления. Тема Red John открыта.';
     toast(msg, 'achievement');
     logToday({ icon:'🩸', label:'Секрет: Red John', detail: reason === 'book' ? 'книга Red John · 41' : '10 смен темы' });
+    return true;
+  }
+
+  function unlockSurfTheme(){
+    ensureSecrets();
+    if(isSecretThemeUnlocked('surf')) return false;
+    grantSecretUnlock('surf', 'Тема «Серф» открыта — солнце, море и пальмы.', 'Секрет: Серф');
+    state.theme = 'surf';
+    if(state.themeAnim) state.themeAnim.surf = true;
+    return true;
+  }
+
+  function unlockAcidTheme(){
+    ensureSecrets();
+    if(isSecretThemeUnlocked('acid')) return false;
+    grantSecretUnlock('acid', 'Тема «Гламур» открыта — ярко-розовый шик.', 'Секрет: Гламур');
+    state.theme = 'acid';
+    if(state.themeAnim) state.themeAnim.acid = true;
     return true;
   }
 
@@ -330,9 +513,179 @@
   function registerThemeSwap(nextTheme){
     ensureSecrets();
     if(!nextTheme || nextTheme === state.theme) return false;
+    const leaving = state.theme;
     state.secrets.themeSwaps = (state.secrets.themeSwaps || 0) + 1;
-    if(state.secrets.themeSwaps >= 10) return unlockRedJohn('swaps');
+
+    if(leaving === 'redjohn' && nextTheme !== 'redjohn'){
+      state.secrets.redjohnLeaves = (state.secrets.redjohnLeaves || 0) + 1;
+      if(state.secrets.redjohnLeaves >= 10){
+        grantSecretUnlock('redjohn_palette', 'Расцветка Red John: красные тона усилены.', 'Расцветка Red John');
+      }
+    }
+
+    if(!isSecretThemeUnlocked('redjohn') && state.secrets.themeSwaps >= 10){
+      return unlockRedJohn('swaps');
+    }
     return false;
+  }
+
+  function onSecretThemeDayClosed(){
+    ensureSecrets();
+    const theme = state.theme;
+    if(theme === 'redjohn'){
+      state.secrets.rjCloseDays = (state.secrets.rjCloseDays || 0) + 1;
+      if(state.secrets.rjCloseDays >= 1) grantSecretUnlock('frame_redjohn', 'Рамка «Улыбка Джона» — за закрытый день.', 'Рамка Red John');
+      if(state.secrets.rjCloseDays >= 3) grantSecretUnlock('aura_redjohn', 'Аура «Кровавое сияние» — 3 закрытых дня.', 'Аура Red John');
+    }
+    if(theme === 'surf'){
+      state.secrets.surfCloseDays = (state.secrets.surfCloseDays || 0) + 1;
+      if(state.secrets.surfCloseDays >= 1) grantSecretUnlock('frame_surf', 'Рамка «Горизонт» — за закрытый день на серфе.', 'Рамка Серф');
+      if(state.secrets.surfCloseDays >= 3) grantSecretUnlock('aura_surf', 'Аура «Солнечный блик» — 3 дня на серфе.', 'Аура Серф');
+    }
+    if(theme === 'acid'){
+      state.secrets.acidCloseDays = (state.secrets.acidCloseDays || 0) + 1;
+      if(state.secrets.acidCloseDays >= 1) grantSecretUnlock('frame_acid', 'Рамка «Гламурный контур» открыта.', 'Рамка Гламур');
+      if(state.secrets.acidCloseDays >= 3) grantSecretUnlock('aura_acid', 'Аура «Гламурное сияние» — 3 дня.', 'Аура Гламур');
+    }
+    if(theme === 'storm'){
+      state.secrets.stormCloseDays = (state.secrets.stormCloseDays || 0) + 1;
+      if(state.secrets.stormCloseDays >= 1){
+        grantSecretUnlock('frame_storm', 'Рамка «Грозовая дуга» открыта.', 'Рамка Шторм');
+        grantSecretUnlock('badge_storm', 'Значок «Молния» открыт.', 'Значок Шторм');
+      }
+    }
+  }
+
+  // Back-compat alias used by Daybook install
+  function onRedJohnDayClosed(){ onSecretThemeDayClosed(); }
+
+  function redeemPromoCode(raw){
+    ensureSecrets();
+    const code = String(raw || '').trim().toUpperCase().replace(/\s+/g, '');
+    if(!code){ toast('Введи промокод', 'info'); return false; }
+    if(code !== PROMO_CODE){ toast('Неверный промокод', 'info'); return false; }
+    if(isSecretThemeUnlocked('promo_aikraam')){
+      toast('Промокод уже активирован', 'info');
+      return false;
+    }
+    state.secrets.unlocked.push('promo_aikraam');
+    ALL_SECRET_IDS.forEach(function(id){
+      if(state.secrets.unlocked.indexOf(id) === -1) state.secrets.unlocked.push(id);
+    });
+    state.cosmetics = state.cosmetics || { owned:[], equipped: defaultEquipped(), photos:[] };
+    state.cosmetics.owned = state.cosmetics.owned || [];
+    COSMETICS.forEach(function(c){
+      if(state.cosmetics.owned.indexOf(c.id) === -1) state.cosmetics.owned.push(c.id);
+    });
+    AVATARS.forEach(function(a){
+      if(state.cosmetics.owned.indexOf(a.id) === -1) state.cosmetics.owned.push(a.id);
+    });
+    // Fill quest counters so hints show complete
+    state.secrets.bubblesPopped = Math.max(state.secrets.bubblesPopped || 0, 10);
+    state.secrets.petalsCaught = Math.max(state.secrets.petalsCaught || 0, 12);
+    state.secrets.redjohnLeaves = Math.max(state.secrets.redjohnLeaves || 0, 10);
+    state.secrets.rjCloseDays = Math.max(state.secrets.rjCloseDays || 0, 3);
+    state.secrets.surfCloseDays = Math.max(state.secrets.surfCloseDays || 0, 3);
+    state.secrets.acidCloseDays = Math.max(state.secrets.acidCloseDays || 0, 3);
+    state.secrets.stormCloseDays = Math.max(state.secrets.stormCloseDays || 0, 1);
+    lastAppliedTheme = null;
+    lastFxSignature = null;
+    toast('AIKRAAM принят. Весь контент разблокирован.', 'achievement');
+    logToday({ icon:'🎁', label:'Промокод AIKRAAM', detail:'открыто всё' });
+    return true;
+  }
+
+  function themeQuestHintHtml(){
+    ensureSecrets();
+    const theme = state.theme;
+    if(theme === 'redjohn' && isSecretThemeUnlocked('redjohn')){
+      const leaves = state.secrets.redjohnLeaves || 0;
+      const closes = state.secrets.rjCloseDays || 0;
+      const bits = [];
+      bits.push(isSecretThemeUnlocked('redjohn_palette') ? 'расцветка открыта' : ('уходы с темы: ' + Math.min(leaves,10) + '/10'));
+      bits.push(isSecretThemeUnlocked('frame_redjohn') ? 'рамка открыта' : ('закрытые дни: ' + Math.min(closes,1) + '/1 → рамка'));
+      bits.push(isSecretThemeUnlocked('aura_redjohn') ? 'аура открыта' : ('закрытые дни: ' + Math.min(closes,3) + '/3 → аура'));
+      bits.push(isSecretThemeUnlocked('badge_redjohn') ? 'значок открыт' : 'значок — дочитай книгу');
+      return '<p class="theme-quest-hint theme-quest-rj">Red John · ' + bits.join(' · ') + '</p>';
+    }
+    if(theme === 'depth'){
+      const n = state.secrets.bubblesPopped || 0;
+      if(isSecretThemeUnlocked('surf')){
+        return '<p class="theme-quest-hint theme-quest-depth">Глубина · тема «Серф» уже открыта · лопни пузырь ради удовольствия</p>';
+      }
+      return '<p class="theme-quest-hint theme-quest-depth">Глубина · лопни пузыри: ' + Math.min(n,10) + '/10 → тема «Серф»</p>';
+    }
+    if(theme === 'sakura'){
+      const n = state.secrets.petalsCaught || 0;
+      if(isSecretThemeUnlocked('acid')){
+        return '<p class="theme-quest-hint theme-quest-sakura">Сакура · тема «Гламур» уже открыта</p>';
+      }
+      return '<p class="theme-quest-hint theme-quest-sakura">Сакура · поймай лепестки: ' + Math.min(n,12) + '/12 → тема «Гламур»</p>';
+    }
+    if(theme === 'surf' && isSecretThemeUnlocked('surf')){
+      const c = state.secrets.surfCloseDays || 0;
+      const bits = [];
+      bits.push(isSecretThemeUnlocked('frame_surf') ? 'рамка открыта' : ('закрытые дни: ' + Math.min(c,1) + '/1 → рамка'));
+      bits.push(isSecretThemeUnlocked('aura_surf') ? 'аура открыта' : ('закрытые дни: ' + Math.min(c,3) + '/3 → аура'));
+      return '<p class="theme-quest-hint theme-quest-surf">Серф · ' + bits.join(' · ') + '</p>';
+    }
+    if(theme === 'acid' && isSecretThemeUnlocked('acid')){
+      const c = state.secrets.acidCloseDays || 0;
+      const bits = [];
+      bits.push(isSecretThemeUnlocked('frame_acid') ? 'рамка открыта' : ('закрытые дни: ' + Math.min(c,1) + '/1 → рамка'));
+      bits.push(isSecretThemeUnlocked('aura_acid') ? 'аура открыта' : ('закрытые дни: ' + Math.min(c,3) + '/3 → аура'));
+      return '<p class="theme-quest-hint theme-quest-acid">Гламур · ' + bits.join(' · ') + '</p>';
+    }
+    if(theme === 'storm'){
+      const c = state.secrets.stormCloseDays || 0;
+      if(isSecretThemeUnlocked('frame_storm')){
+        return '<p class="theme-quest-hint theme-quest-storm">Шторм · рамка и значок открыты</p>';
+      }
+      return '<p class="theme-quest-hint theme-quest-storm">Шторм · закрой день: ' + Math.min(c,1) + '/1 → рамка и значок</p>';
+    }
+    if(theme === 'cyber' && !isSecretThemeUnlocked('aura_neon')){
+      return '<p class="theme-quest-hint theme-quest-cyber">Неон · запиши тренировку → аура «Кибер-ореол»</p>';
+    }
+    return '';
+  }
+
+  function popDepthBubble(el){
+    ensureSecrets();
+    if(!state || state.theme !== 'depth') return;
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    state.secrets.bubblesPopped = (state.secrets.bubblesPopped || 0) + 1;
+    const n = state.secrets.bubblesPopped;
+    if(n < 10){
+      toast('Пузырь! ' + n + '/10', 'info');
+      save();
+      return;
+    }
+    if(!isSecretThemeUnlocked('surf')){
+      unlockSurfTheme();
+      save(); render();
+      return;
+    }
+    grantSecretUnlock('badge_bubble');
+    save();
+  }
+
+  function catchSakuraPetal(el){
+    ensureSecrets();
+    if(!state || state.theme !== 'sakura') return;
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    state.secrets.petalsCaught = (state.secrets.petalsCaught || 0) + 1;
+    const n = state.secrets.petalsCaught;
+    if(n < 12){
+      toast('Лепесток! ' + n + '/12', 'info');
+      save();
+      return;
+    }
+    if(!isSecretThemeUnlocked('acid')){
+      unlockAcidTheme();
+      save(); render();
+      return;
+    }
+    save();
   }
 
   function getAvatarDef(id){
@@ -341,12 +694,29 @@
   function getCosmetic(id){
     return COSMETICS.find(function(c){ return c.id===id; }) || null;
   }
+  function isCosmeticUnlocked(item){
+    if(!item) return false;
+    if(!item.secret) return true;
+    return isSecretThemeUnlocked(item.secret);
+  }
   function ownsCosmetic(id){
-    return !!(state && state.cosmetics && state.cosmetics.owned && state.cosmetics.owned.indexOf(id) !== -1);
+    if(!state || !state.cosmetics || !state.cosmetics.owned) return false;
+    const item = getCosmetic(id);
+    if(item && item.secret && !isCosmeticUnlocked(item)) return false;
+    return state.cosmetics.owned.indexOf(id) !== -1;
   }
   function equippedOf(slot){
     if(!state || !state.cosmetics || !state.cosmetics.equipped) return null;
     return state.cosmetics.equipped[slot];
+  }
+
+  function cosmeticActionButton(id, owned, equipped, price, item){
+    if(equipped) return '<button class="btn btn-ghost btn-sm" disabled>Надето</button>';
+    if(owned) return '<button class="btn btn-primary btn-sm" data-action="equip-cosmetic" data-id="' + id + '">Надеть</button>';
+    if(item && item.secret){
+      return '<button class="btn btn-ghost btn-sm" disabled>Секрет</button>';
+    }
+    return '<button class="btn btn-primary btn-sm" data-action="buy-cosmetic" data-id="' + id + '">Купить · ' + price + ' ✦</button>';
   }
 
   function characterPortrait(opts){
@@ -580,14 +950,28 @@
     state.cosmetics.equipped = state.cosmetics.equipped || defaultEquipped();
     state.cosmetics.photos = state.cosmetics.photos || [];
     if(state.cosmetics.equipped.photoId === undefined) state.cosmetics.equipped.photoId = null;
+    // Strip secret cosmetics until their quest is done (they were previously free:true)
+    state.cosmetics.owned = state.cosmetics.owned.filter(function(id){
+      const item = getCosmetic(id);
+      if(item && item.secret && !isCosmeticUnlocked(item)) return false;
+      return true;
+    });
     defaultOwnedCosmetics().forEach(function(id){
       if(state.cosmetics.owned.indexOf(id) === -1) state.cosmetics.owned.push(id);
+    });
+    COSMETICS.forEach(function(c){
+      if(c.secret && isCosmeticUnlocked(c) && state.cosmetics.owned.indexOf(c.id) === -1){
+        state.cosmetics.owned.push(c.id);
+      }
     });
     ['avatar','shape','frame','aura','badge'].forEach(function(slot){
       if(!state.cosmetics.equipped[slot]) state.cosmetics.equipped[slot] = defaultEquipped()[slot];
     });
     if(!ownsCosmetic(state.cosmetics.equipped.avatar)) state.cosmetics.equipped.avatar = 'atlas';
     if(!ownsCosmetic(state.cosmetics.equipped.shape)) state.cosmetics.equipped.shape = 'shape_hex';
+    ['frame','aura','badge'].forEach(function(slot){
+      if(!ownsCosmetic(state.cosmetics.equipped[slot])) state.cosmetics.equipped[slot] = defaultEquipped()[slot];
+    });
     migratePhotosToBlobStore();
     if(state.cosmetics.equipped.photoId && !getPhoto(state.cosmetics.equipped.photoId)){
       state.cosmetics.equipped.photoId = null;
@@ -642,6 +1026,11 @@
         toast: toast,
         askConfirm: askConfirm,
         maybeClaimHabitsBonus: maybeClaimHabitsBonus,
+        onWorkoutLogged: function(){
+          if(state && state.theme === 'cyber'){
+            grantSecretUnlock('aura_neon', 'Аура «Кибер-ореол» — тренировка в Неоне.', 'Аура Неон');
+          }
+        },
       });
     }
     if(window.Daybook){
@@ -662,6 +1051,19 @@
         toast: toast,
         characterPortrait: characterPortrait,
         dominantColor: dominantColor,
+        onRedJohnDayClosed: onSecretThemeDayClosed,
+        isSecretUnlocked: isSecretThemeUnlocked,
+      });
+    }
+    if(window.BeyondNotes){
+      BeyondNotes.install({
+        getState: function(){ return state; },
+        save: save,
+        render: render,
+        esc: esc,
+        toast: toast,
+        uid: uid,
+        askConfirm: askConfirm,
       });
     }
   }
@@ -672,7 +1074,7 @@
       trackedAreas: opts.tracked || { workouts:true, books:true, goals:true, tasks:true },
       theme:'obsidian',
       themeAnim:{},
-      secrets:{ themeSwaps:0, unlocked:[] },
+      secrets:{ themeSwaps:0, redjohnLeaves:0, rjCloseDays:0, unlocked:[] },
       level:1, xp:0,
       sparks:30,
       cosmetics:{ owned: defaultOwnedCosmetics(), equipped: defaultEquipped(), photos: [] },
@@ -750,6 +1152,7 @@
     } else {
       reconcileStreak();
     }
+    if(window.BeyondNotes) BeyondNotes.migrate(state);
   }
 
   function reconcileStreak(){
@@ -893,6 +1296,9 @@
     const newLevel = levelFromXp(state.xp);
     if(newLevel > state.level){
       state.level = newLevel;
+      if(newLevel >= 5){
+        grantSecretUnlock('shape_star', 'Форма «Звезда» — 5 уровень.', 'Форма Звезда');
+      }
       return { leveledUp:true, newLevel:newLevel };
     }
     return { leveledUp:false };
@@ -1009,6 +1415,9 @@
     };
 
     touchStreakForToday();
+    if(state.theme === 'cyber'){
+      grantSecretUnlock('aura_neon', 'Аура «Кибер-ореол» — тренировка в Неоне.', 'Аура Неон');
+    }
 
     if(isStrength){
       // base reward for showing up
@@ -1113,6 +1522,9 @@
     const lvl = addXp(30);
     const sparks = addSparks(15);
     logToday({ icon:'📖', label:b.title, detail:'+20 Интеллект · +30 XP · +' + sparks + ' ✦' });
+    if(isRedJohnBook(b.title, b.author)){
+      grantSecretUnlock('badge_redjohn', 'Значок «Метка» — книга прочитана.', 'Значок Red John');
+    }
     checkAchievements();
     if(window.LifeFeatures) LifeFeatures.syncLinkedGoals();
     save(); render();
@@ -1226,8 +1638,8 @@
   function renderSidebar(){
     const items = [
       { key:'dashboard',     icon:'🏠', label:'Дашборд',     show:true },
-      { key:'profile',       icon:'🪞', label:'Витрина',     show:true },
-      { key:'character',     icon:'🎭', label:'Персонаж',    show:true },
+      { key:'profile',       icon:'◆', label:'Витрина',     show:true },
+      { key:'notes',         icon:'📝', label:'Notes',       show:true },
       { key:'workouts',      icon:'💪', label:'Тренировки',  show:state.trackedAreas.workouts },
       { key:'books',         icon:'📖', label:'Книги',        show:state.trackedAreas.books },
       { key:'tasks',         icon:'✅', label:'Привычки',     show:state.trackedAreas.tasks },
@@ -1254,9 +1666,10 @@
   }
 
   function renderTopbar(){
-    const titles = { dashboard:'Дашборд', profile:'Витрина', character:'Комната персонажа', workouts:'Тренировки', books:'Книги', tasks:'Привычки', goals:'Цели', achievements:'Достижения', friends:'Друзья' };
+    const titles = { dashboard:'Дашборд', profile:'Витрина', character:'Витрина', notes:'Заметки', workouts:'Тренировки', books:'Книги', tasks:'Привычки', goals:'Цели', achievements:'Достижения', friends:'Друзья' };
     if(window.LifeFeatures) Object.assign(titles, LifeFeatures.getTopbarTitles());
     if(window.Daybook) Object.assign(titles, Daybook.getTopbarTitles());
+    if(window.BeyondNotes) Object.assign(titles, BeyondNotes.getTopbarTitles());
     return '<header class="topbar"><h1>' + (titles[currentScreen]||'') + '</h1>' +
       '<div class="topbar-right">' +
       '<span class="sparks-chip" title="Искры — валюта персонажа"><span class="sparks-ico">✦</span>' + (state.sparks||0) + '</span>' +
@@ -1335,8 +1748,7 @@
     if(state.trackedAreas.tasks) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="tasks">✅ Привычки</button>');
     if(state.trackedAreas.tasks || state.trackedAreas.workouts) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="weekplan">📅 План</button>');
     if(state.trackedAreas.goals) quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="goals">🎯 Цель</button>');
-    quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="profile">🪞 Витрина</button>');
-    quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="character">🎭 Персонаж</button>');
+    quickItems.push('<button class="btn btn-ghost btn-quick" data-action="nav" data-screen="profile">◆ Витрина</button>');
 
     const titleLine = window.Daybook ? Daybook.titleName(state) : levelTitle(lvl);
     const flame = window.Daybook ? Daybook.flameTier(state.streak||0) : { emoji:'🔥', label:'' };
@@ -1353,9 +1765,6 @@
         '<div class="xp-total">Всего опыта: ' + state.xp + '</div></div>' +
     '</div>' +
     (window.Daybook ? Daybook.renderDaySpread() : '') +
-    (state.theme === 'redjohn'
-      ? '<div class="panel rj-banner" aria-hidden="true"><img class="rj-banner-img" src="./icons/red-john.png" alt=""><div class="rj-banner-caption">he is smiling</div></div>'
-      : '') +
     (window.LifeFeatures ? LifeFeatures.renderDashboardExtras() : '') +
     todayFocus +
     '<div class="stat-grid">' + statsHtml + '</div>' +
@@ -1365,12 +1774,6 @@
           (dayClosed ? ' · сегодня закрыт' : ' · сегодня ещё открыт') + '</div></div>' +
       '<div class="panel quick-panel"><h3 style="margin-bottom:12px;">Быстрые действия</h3><div class="quick-actions">' + quickItems.join('') + '</div></div>' +
     '</div>';
-  }
-
-  function cosmeticActionButton(id, owned, equipped, price){
-    if(equipped) return '<button class="btn btn-ghost btn-sm" disabled>Надето</button>';
-    if(owned) return '<button class="btn btn-primary btn-sm" data-action="equip-cosmetic" data-id="' + id + '">Надеть</button>';
-    return '<button class="btn btn-primary btn-sm" data-action="buy-cosmetic" data-id="' + id + '">Купить · ' + price + ' ✦</button>';
   }
 
   function renderAvatarCards(){
@@ -1400,14 +1803,17 @@
   }
 
   function renderSlotCards(slot){
-    const items = COSMETICS.filter(function(c){ return c.slot===slot; });
+    const items = COSMETICS.filter(function(c){
+      if(c.slot !== slot) return false;
+      if(c.secret && !isSecretThemeUnlocked('redjohn') && !isCosmeticUnlocked(c)) return false;
+      return true;
+    });
     const eq = equippedOf(slot);
     return '<div class="cosmetic-grid">' + items.map(function(item){
       const owned = ownsCosmetic(item.id);
       const equipped = eq === item.id;
       const previewEq = Object.assign({}, state.cosmetics.equipped);
       previewEq[slot] = item.id;
-      // keep current photo when previewing shape/frame/etc
       const prev = state.cosmetics.equipped;
       state.cosmetics.equipped = previewEq;
       const preview = characterPortrait({ size:64, name:state.character.name, glowColor:dominantColor() });
@@ -1416,7 +1822,7 @@
         '<div class="cosmetic-preview">' + preview + '</div>' +
         '<div class="cosmetic-title">' + esc(item.name) + '</div>' +
         '<div class="cosmetic-sub">' + (item.blurb ? esc(item.blurb) : (item.free ? 'Бесплатно' : (item.price + ' ✦'))) + '</div>' +
-        cosmeticActionButton(item.id, owned, equipped, item.price) +
+        cosmeticActionButton(item.id, owned, equipped, item.price, item) +
       '</div>';
     }).join('') + '</div>';
   }
@@ -1531,11 +1937,25 @@
           '<span class="loadout-pill">' + esc(aura ? aura.name : '—') + '</span>' +
           '<span class="loadout-pill">' + esc(badge ? badge.name : '—') + '</span>' +
         '</div>' +
-        '<button type="button" class="btn btn-ghost btn-sm" data-action="nav" data-screen="profile" style="margin-top:12px;">Открыть витрину →</button>' +
       '</div>' +
       '<div class="char-tabs">' + tabsHtml + '</div>' +
       '<div class="panel">' + body + '</div>' +
     '</div>';
+  }
+
+  function renderProfileScreen(){
+    const tabs = [
+      { id:'vitrine', label:'Витрина' },
+      { id:'character', label:'Аватар' },
+    ];
+    const tabsHtml = '<div class="char-tabs profile-tabs">' + tabs.map(function(t){
+      return '<button type="button" class="char-tab ' + (profileTab===t.id?'active':'') + '" data-action="profile-tab" data-tab="' + t.id + '">' + t.label + '</button>';
+    }).join('') + '</div>';
+    if(profileTab === 'character'){
+      return tabsHtml + renderCharacter();
+    }
+    const showcase = window.Daybook ? Daybook.renderProfileShowcase() : '';
+    return tabsHtml + showcase;
   }
 
   function renderWorkouts(){
@@ -2011,11 +2431,22 @@
     const animToggle = hasFx
       ? '<label class="check-row" style="margin:0 0 18px;"><input type="checkbox" data-action="toggle-theme-anim" ' + (animOn?'checked':'') + '> Анимация этой темы</label>'
       : '<p style="font-size:12.5px;color:var(--text-dim);margin:0 0 18px;">У этой темы нет фоновой анимации.</p>';
+    ensureSecrets();
+    const themeHint = themeQuestHintHtml();
+    const promoDone = isSecretThemeUnlocked('promo_aikraam');
     return '<div class="modal-overlay" data-action="close-settings"><div class="modal" data-action="noop">' +
       '<h3>Настройки</h3>' +
       '<div class="field field-wide" style="margin-bottom:12px;"><label>Оформление</label><div class="theme-grid">' + themeSwatches + '</div></div>' +
       animToggle +
+      themeHint +
       (window.LifeFeatures ? LifeFeatures.renderPaletteSettings() : '') +
+      '<form data-form="redeem-promo" class="promo-row">' +
+        '<div class="field" style="flex:1;margin:0;"><label>Промокод</label>' +
+          '<input name="code" placeholder="Введи код" maxlength="32" ' + (promoDone ? 'disabled value="AIKRAAM"' : '') + '>' +
+        '</div>' +
+        '<button class="btn btn-primary" type="submit" ' + (promoDone ? 'disabled' : '') + '>' + (promoDone ? 'Активирован' : 'Применить') + '</button>' +
+      '</form>' +
+      (promoDone ? '<p class="theme-quest-hint" style="margin-top:-8px;margin-bottom:14px;">Весь контент открыт промокодом.</p>' : '') +
       '<form data-form="update-settings" class="form-grid">' +
         '<div class="field field-wide"><label>Имя персонажа</label><input name="name" value="' + esc(state.character.name) + '" maxlength="40"></div>' +
         '<div class="field"><label>Возраст</label><input name="age" type="number" min="1" max="120" value="' + (state.character.age != null ? esc(state.character.age) : '') + '" placeholder="не обязательно"></div>' +
@@ -2063,8 +2494,22 @@
   /* ============== Render: root ============== */
   function renderScreenContent(){
     switch(currentScreen){
-      case 'profile': return window.Daybook ? Daybook.renderProfileShowcase() : renderCharacter();
-      case 'character': return renderCharacter();
+      case 'profile': return renderProfileScreen();
+      case 'character':
+        profileTab = 'character';
+        currentScreen = 'profile';
+        return renderProfileScreen();
+      case 'notes': {
+        if(window.BeyondNotes) return BeyondNotes.renderBoard();
+        // Fallback if module still loading / stale shell cache
+        ensureNotesModule().then(function(ok){
+          if(ok){
+            installLifeFeatures();
+            if(currentScreen === 'notes') render();
+          }
+        });
+        return '<div class="empty-state">Загружаю доску Notes…</div>';
+      }
       case 'workouts': return renderWorkouts();
       case 'books': return renderBooks();
       case 'tasks': return renderTasks();
@@ -2094,9 +2539,9 @@
       }
     }
     root.innerHTML =
-      '<div class="app-shell">' +
+      '<div class="app-shell' + (currentScreen === 'notes' ? ' notes-mode' : '') + '">' +
         renderSidebar() +
-        '<div class="main">' + renderTopbar() + '<div class="screen">' + renderScreenContent() + '</div></div>' +
+        '<div class="main">' + renderTopbar() + '<div class="screen' + (currentScreen === 'notes' ? ' screen-notes' : '') + '">' + renderScreenContent() + '</div></div>' +
       '</div>' +
       renderToasts() +
       (settingsOpen ? renderSettingsModal() : '') +
@@ -2104,6 +2549,8 @@
       renderConfirmModal();
     if(window.LifeFeatures) LifeFeatures.afterRender();
     if(window.Daybook) Daybook.afterRender();
+    if(window.BeyondNotes && currentScreen === 'notes') BeyondNotes.afterRender();
+    else document.documentElement.classList.remove('notes-is-fullscreen');
     reflowBookshelfIfNeeded();
   }
 
@@ -2196,6 +2643,14 @@
         toast('Настройки сохранены', 'success');
         break;
       }
+      case 'redeem-promo': {
+        const code = (fd.get('code')||'').toString();
+        if(redeemPromoCode(code)){
+          settingsOpen = true;
+          save(); render();
+        }
+        break;
+      }
     }
   }
 
@@ -2208,11 +2663,32 @@
       if(!el) return;
       const action = el.dataset.action;
       const id = el.dataset.id;
+      if(window.BeyondNotes && BeyondNotes.handleAction(action, el, id)) return;
       if(window.Daybook && Daybook.handleAction(action, el, id)) return;
       if(window.LifeFeatures && LifeFeatures.handleAction(action, el, id)) return;
       switch(action){
-        case 'nav':
-          currentScreen = el.dataset.screen; settingsOpen = false; render(); break;
+        case 'nav': {
+          let next = el.dataset.screen;
+          if(next === 'character'){
+            next = 'profile';
+            profileTab = 'character';
+          } else if(next === 'profile'){
+            profileTab = 'vitrine';
+          }
+          if(currentScreen === 'notes' && next !== 'notes' && state && state.notesBoard){
+            state.notesBoard.fullscreen = false;
+            document.documentElement.classList.remove('notes-is-fullscreen');
+          }
+          currentScreen = next;
+          settingsOpen = false;
+          render();
+          break;
+        }
+        case 'profile-tab':
+          profileTab = el.dataset.tab || 'vitrine';
+          currentScreen = 'profile';
+          render();
+          break;
         case 'char-tab':
           charRoomTab = el.dataset.tab || 'avatars'; render(); break;
         case 'equip-cosmetic':
@@ -2321,6 +2797,18 @@
       handleFormSubmit(kind, fd, form);
     });
 
+    // Theme FX lives outside #root — bubbles / petals must be clickable here.
+    const petal = document.getElementById('petal-layer');
+    if(petal && !petal.dataset.bound){
+      petal.dataset.bound = '1';
+      petal.addEventListener('click', function(e){
+        const bubble = e.target.closest('[data-action="pop-bubble"]');
+        if(bubble){ e.preventDefault(); popDepthBubble(bubble); return; }
+        const petalEl = e.target.closest('[data-action="catch-petal"]');
+        if(petalEl){ e.preventDefault(); catchSakuraPetal(petalEl); }
+      });
+    }
+
     // Spine sizes / shelf packing depend on width — reflow on resize.
     let lastShelfW = typeof window !== 'undefined' ? window.innerWidth : 0;
     let resizeTimer = null;
@@ -2338,8 +2826,35 @@
   /* ============== Init ============== */
   let bound = false;
   let fontsWatched = false;
+
+  function loadScriptOnce(src){
+    return new Promise(function(resolve){
+      const existing = document.querySelector('script[data-beyond-src="' + src + '"]');
+      if(existing){
+        if(existing.dataset.loaded === '1') resolve(true);
+        else existing.addEventListener('load', function(){ resolve(true); });
+        existing.addEventListener('error', function(){ resolve(false); });
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=8';
+      s.async = false;
+      s.dataset.beyondSrc = src;
+      s.onload = function(){ s.dataset.loaded = '1'; resolve(true); };
+      s.onerror = function(){ resolve(false); };
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureNotesModule(){
+    if(window.BeyondNotes) return true;
+    const ok = await loadScriptOnce('./js/notes.js');
+    return !!(ok && window.BeyondNotes);
+  }
+
   async function init(){
     if(!bound){ bindEvents(); bound = true; }
+    await ensureNotesModule();
     installLifeFeatures();
     await load();
     render();

@@ -364,6 +364,7 @@ window.LifeFeatures = (function(){
     else if(weight>0){ isTrueRecord = e1rm > prevPR.e1rm; isRecord = isTrueRecord; }
     else { isTrueRecord = prevPR.weight===0 && reps > prevPR.reps; isRecord = isTrueRecord; }
     deps.touchStreakForToday();
+    if(deps.onWorkoutLogged) deps.onWorkoutLogged();
     const gain = isRecord ? 16 : 8, xp = isRecord ? 60 : 30, sparksGain = isRecord ? 20 : 10;
     const before = state.stats.strength;
     deps.addStat("strength", gain);
@@ -394,6 +395,7 @@ window.LifeFeatures = (function(){
     const mins = Number(data.duration)||0;
     const minsBefore = state.cardioMinutes||0;
     deps.touchStreakForToday();
+    if(deps.onWorkoutLogged) deps.onWorkoutLogged();
     const before = state.stats.endurance;
     state.cardioMinutes = minsBefore + mins;
     const eGain = Math.max(5, Math.round(mins/3));

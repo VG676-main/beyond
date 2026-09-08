@@ -59,6 +59,11 @@ window.Daybook = (function(){
     { id:"champ",    name:"Чемпион",            minStreak:0,  minLevel:10 },
     { id:"master",   name:"Мастер",             minStreak:0,  minLevel:15 },
     { id:"myth",     name:"Легенда",            minStreak:0,  minLevel:20 },
+    { id:"witness",  name:"Свидетель улыбки",   minStreak:0,  minLevel:1, secret:"redjohn" },
+    { id:"surfer",   name:"Серфер рассвета",    minStreak:0,  minLevel:1, secret:"surf" },
+    { id:"acidking", name:"Король гламура",     minStreak:0,  minLevel:1, secret:"acid" },
+    { id:"bubbler",  name:"Охотник за пузырями",minStreak:0,  minLevel:1, secret:"badge_bubble" },
+    { id:"coder",    name:"Хранитель кода",     minStreak:0,  minLevel:1, secret:"promo_aikraam" },
   ];
 
   function S(){ return deps.getState(); }
@@ -152,6 +157,9 @@ window.Daybook = (function(){
   function titleUnlocked(state, id){
     const t = PROFILE_TITLES.find(function(x){ return x.id===id; });
     if(!t) return false;
+    if(t.secret){
+      return !!(deps && deps.isSecretUnlocked && deps.isSecretUnlocked(t.secret));
+    }
     return (state.streak||0) >= t.minStreak && (state.level||1) >= t.minLevel;
   }
 
@@ -160,7 +168,7 @@ window.Daybook = (function(){
   }
 
   function bestTitleId(state){
-    const list = unlockedTitles(state);
+    const list = unlockedTitles(state).filter(function(t){ return !t.secret; });
     return list.length ? list[list.length-1].id : "novice";
   }
 
@@ -333,6 +341,7 @@ window.Daybook = (function(){
     syncAchievementStickers(state, true);
     unlockStreakRewards(state, false);
     if(!titleUnlocked(state, state.profileTitle)) state.profileTitle = bestTitleId(state);
+    if(deps.onRedJohnDayClosed) deps.onRedJohnDayClosed();
     deps.save();
     deps.render();
     const flame = flameTier(state.streak);
@@ -544,8 +553,7 @@ window.Daybook = (function(){
       '<div class="panel"><div class="panel-head"><h3>Титул на витрине</h3></div><div class="title-row">' + titleChips + '</div></div>' +
       '<div class="panel"><div class="panel-head"><h3>Стикеры</h3><span class="screen-sub">нажми — закрепить на витрине</span></div>' +
         renderStickerShelf(state, true) +
-      '</div>' +
-      '<div class="vitrine-foot"><button type="button" class="btn btn-ghost" data-action="nav" data-screen="character">Комната персонажа →</button></div>';
+      '</div>';
   }
 
   function handleAction(action, el, id){

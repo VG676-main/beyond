@@ -292,6 +292,121 @@
     --book-spine-ink:#f4e8f0;
   }
 
+  /* ---------- Theme: Серф (Bali magazine — full bleed) ---------- */
+  html[data-theme="surf"]{
+    --bg:#0a4a52;
+    --bg-elev:rgba(8, 55, 62, 0.88);
+    --bg-elev-2:rgba(10, 70, 78, 0.92);
+    --bg-elev-3:rgba(14, 90, 98, 0.95);
+    --border:#f2e307;
+    --border-soft:rgba(242, 227, 7, 0.35);
+    --text:#e8fffe;
+    --text-muted:#9ad4d0;
+    --text-dim:#5fa8a4;
+    --gold:#f2e307;
+    --gold-soft:rgba(242, 227, 7, 0.18);
+    --gold-light:#fff566;
+    --crimson:#ff6b8a;
+    --crimson-soft:rgba(255, 107, 138, 0.2);
+    --teal:#2ec4b6;
+    --teal-soft:rgba(46, 196, 182, 0.2);
+    --violet:#3b5bdb;
+    --violet-soft:rgba(59, 91, 219, 0.25);
+    --on-accent:#0a2a30;
+    --glow-1:rgba(242, 227, 7, 0.22);
+    --glow-2:rgba(46, 196, 182, 0.18);
+    --avatar-a:#2ec4b6;
+    --avatar-b:#f2e307;
+    --shelf-wood:#0d5c66;
+    --shelf-wood-mid:#147a86;
+    --shelf-wood-light:#1f9aa8;
+    --shelf-inner:#063840;
+    --book-1:#f2e307;
+    --book-2:#1e3a8a;
+    --book-3:#2ec4b6;
+    --book-4:#fb7185;
+    --book-5:#0ea5e9;
+    --book-spine-ink:#062a30;
+  }
+  html[data-theme="surf"] body{
+    background:#0a4a52;
+  }
+  html[data-theme="surf"] .panel,
+  html[data-theme="surf"] .sidebar,
+  html[data-theme="surf"] .topbar{
+    background:rgba(6, 40, 46, 0.78);
+    backdrop-filter:blur(12px);
+    border-color:rgba(242, 227, 7, 0.28);
+  }
+  html[data-theme="surf"] .btn-primary{
+    background:linear-gradient(135deg, #f2e307, #fff566);
+    color:#0a2a30;
+    border:none;
+    font-weight:800;
+  }
+  html[data-theme="surf"] .nav-item.active{
+    background:rgba(242, 227, 7, 0.18);
+    color:#f2e307;
+    border-color:#f2e307;
+  }
+  html[data-theme="surf"] .screen-head h2{
+    color:#f2e307;
+  }
+
+  /* ---------- Theme: Гламур (secret neon pink) ---------- */
+  html[data-theme="acid"]{
+    --bg:#1a0014;
+    --bg-elev:#2a0622;
+    --bg-elev-2:#3d0a32;
+    --bg-elev-3:#520f42;
+    --border:#ff4ec8;
+    --border-soft:#c2188a;
+    --text:#ffe6f7;
+    --text-muted:#ff9ad8;
+    --text-dim:#d45aa8;
+    --gold:#ff2eb6;
+    --gold-soft:#4a1038;
+    --gold-light:#ff66dd;
+    --crimson:#ff4d9a;
+    --crimson-soft:#3a1028;
+    --teal:#ff7ae8;
+    --teal-soft:#3a1840;
+    --violet:#d946ef;
+    --violet-soft:#3b0a4a;
+    --on-accent:#1a0014;
+    --glow-1:rgba(255,0,170,0.35);
+    --glow-2:rgba(255,102,221,0.25);
+    --avatar-a:#ff00aa;
+    --avatar-b:#ff66ee;
+    --shelf-wood:#4a0a38;
+    --shelf-wood-mid:#7a1458;
+    --shelf-wood-light:#c2188a;
+    --shelf-inner:#1a0014;
+    --book-1:#ff00aa;
+    --book-2:#ff66ee;
+    --book-3:#d946ef;
+    --book-4:#ff4d9a;
+    --book-5:#a21caf;
+    --book-spine-ink:#ffe6f7;
+  }
+  html[data-theme="acid"] body{
+    background:
+      radial-gradient(ellipse 700px 500px at 20% 0%, rgba(255,0,170,0.45), transparent 55%),
+      radial-gradient(ellipse 600px 480px at 90% 100%, rgba(217,70,239,0.4), transparent 50%),
+      radial-gradient(ellipse 500px 400px at 50% 50%, rgba(255,102,221,0.18), transparent 60%),
+      #1a0014;
+  }
+  html[data-theme="acid"] .btn-primary{
+    background:linear-gradient(135deg, #ff00aa, #ff66ee);
+    color:#1a0014;
+    box-shadow:0 0 24px rgba(255,0,170,0.45);
+  }
+  html[data-theme="acid"] .nav-item.active{
+    color:#ff66ee;
+    border-color:#ff4ec8;
+    box-shadow:0 0 16px rgba(255,0,170,0.25);
+  }
+
   /* ---------- Theme: Red John (secret) ---------- */
   html[data-theme="redjohn"]{
     --bg:#000000;
@@ -376,15 +491,18 @@
     padding:0 12px 16px;
   }
 
+  /* Centered watermark behind UI (PC + phone) */
   .rj-mark{
     position:absolute;
-    right:2%;
-    bottom:2%;
-    width:min(42vw, 360px);
-    opacity:0.55;
-    filter:contrast(1.08) saturate(1.2);
+    left:50%;
+    top:50%;
+    width:min(62vw, 480px);
+    opacity:0.38;
+    filter:contrast(1.1) saturate(1.25);
+    transform:translate3d(-50%, -50%, 0);
     animation: rj-pulse 7s ease-in-out infinite;
-    z-index:1;
+    z-index:0;
+    pointer-events:none;
   }
   .rj-mark-img{
     display:block;
@@ -394,14 +512,37 @@
     -webkit-user-drag:none;
   }
   @media (max-width:760px){
-    .rj-mark{ width:min(70vw, 280px); opacity:0.45; right:0; bottom:56px; }
+    .rj-mark{ width:min(82vw, 340px); opacity:0.32; top:44%; }
   }
   @keyframes rj-pulse{
-    0%,100%{ opacity:0.45; transform:scale(1); }
-    50%{ opacity:0.62; transform:scale(1.02); }
+    0%,100%{ opacity:0.28; transform:translate3d(-50%, -50%, 0) scale(1); }
+    50%{ opacity:0.48; transform:translate3d(-50%, -50%, 0) scale(1.04); }
   }
   @media (prefers-reduced-motion: reduce){
-    .rj-mark{ animation:none; opacity:0.55; }
+    .rj-mark{ animation:none; opacity:0.36; transform:translate3d(-50%, -50%, 0); }
+  }
+
+  /* Richer Red John palette after 10 leaves */
+  html[data-theme="redjohn"][data-rj-palette="vivid"]{
+    --gold:#e01010;
+    --gold-soft:#3a0606;
+    --gold-light:#ff2a2a;
+    --crimson:#ff1a1a;
+    --crimson-soft:#2e0505;
+    --teal:#8a1818;
+    --violet:#6a0a14;
+    --border:#5a1010;
+    --glow-1:rgba(220,20,20,0.28);
+    --avatar-a:#c41212;
+    --avatar-b:#4a0000;
+    --book-1:#e01010;
+    --book-3:#ff2a2a;
+  }
+  html[data-theme="redjohn"][data-rj-palette="vivid"] body{
+    background:
+      radial-gradient(ellipse 800px 560px at 50% 100%, rgba(180,0,0,0.38), transparent 58%),
+      radial-gradient(ellipse 500px 400px at 20% 10%, rgba(120,0,0,0.18), transparent 50%),
+      #000;
   }
 
   .theme-swatch-secret{
@@ -615,6 +756,18 @@
   .topbar-right{ display:flex; align-items:center; gap:12px; }
 
   .screen{ padding:26px 32px 60px; }
+  .screen-notes{
+    padding:10px 12px 12px;
+    display:flex;
+    flex-direction:column;
+    min-height:calc(100vh - 64px);
+  }
+  .screen-notes .notes-app{
+    flex:1;
+    height:auto;
+    min-height:calc(100vh - 120px);
+  }
+  .app-shell.notes-mode .main{ min-height:100vh; }
   @media (prefers-reduced-motion:no-preference){
     .screen{ animation:fadein .35s ease; }
   }
@@ -815,8 +968,10 @@
   .swatch-preview{ width:100%; height:34px; border-radius:7px; background:linear-gradient(135deg, var(--sw-a), var(--sw-b)); }
   .swatch-name{ font-size:12.5px; font-weight:700; color:var(--text); }
 
-  /* ---------- Theme FX ---------- */
+  /* Atmosphere behind UI; clickable FX above gaps */
+  #atmosphere-layer{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
   #petal-layer{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:40; }
+  #root{ position:relative; z-index:1; }
   .fx-particle{
     position:absolute; top:-12%; line-height:1;
     animation-timing-function:linear; animation-iteration-count:infinite; will-change:transform;
@@ -847,6 +1002,166 @@
     animation-name:fx-bubble-rise;
     animation-timing-function:ease-out;
   }
+  .fx-poppable{
+    pointer-events:auto !important;
+    cursor:pointer;
+    z-index:2;
+  }
+  .fx-poppable:hover{ filter:brightness(1.25) saturate(1.2); }
+  .fx-bubble.fx-poppable{
+    border-width:2px;
+    box-shadow:
+      inset 0 0 8px color-mix(in srgb, var(--gold-light) 25%, transparent),
+      0 0 12px color-mix(in srgb, var(--teal) 40%, transparent);
+  }
+
+  /* Surf Bali magazine scene — full screen behind UI */
+  .surf-scene{
+    position:absolute; inset:0; overflow:hidden; pointer-events:none;
+  }
+  .surf-scene-bali .surf-ocean{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 40%, rgba(255,255,255,0.22), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 70% 60%, rgba(14,165,233,0.55), transparent 50%),
+      linear-gradient(165deg, #5eead4 0%, #2dd4bf 18%, #0ea5e9 42%, #0284c7 62%, #0a4a52 88%, #063840 100%);
+  }
+  .surf-scene-bali .surf-foam{
+    position:absolute; inset:8% 5% 18% 8%;
+    background:
+      radial-gradient(ellipse 50% 35% at 45% 45%, rgba(255,255,255,0.55), transparent 70%),
+      radial-gradient(ellipse 30% 25% at 60% 55%, rgba(255,255,255,0.35), transparent 65%);
+    filter:blur(2px);
+    opacity:0.85;
+    animation:surf-foam-drift 12s ease-in-out infinite;
+  }
+  .surf-scene-bali .surf-wave-sheet{
+    position:absolute; left:12%; right:18%; top:28%; height:38%;
+    border:3px solid rgba(242,227,7,0.55);
+    border-radius:4px;
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(6,56,64,0.35) 100%),
+      repeating-linear-gradient(95deg, transparent, transparent 40px, rgba(255,255,255,0.04) 40px, rgba(255,255,255,0.04) 42px),
+      linear-gradient(160deg, #0369a1, #0c4a6e 50%, #164e63);
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+    opacity:0.55;
+  }
+  .surf-scene-bali .surf-word{
+    position:absolute; left:6%; top:36%;
+    font-family:var(--font-body), system-ui, sans-serif;
+    font-weight:900; font-size:clamp(64px, 14vw, 160px);
+    line-height:0.85; letter-spacing:-0.04em;
+    color:#1e3a8a;
+    text-transform:lowercase;
+    text-shadow:0 2px 0 rgba(255,255,255,0.15);
+    mix-blend-mode:multiply;
+    opacity:0.88;
+  }
+  .surf-scene-bali .surf-pill{
+    position:absolute; left:42%; top:28%;
+    font-family:var(--font-mono);
+    font-size:11px; font-weight:800; letter-spacing:0.12em;
+    padding:6px 14px; border-radius:999px;
+    background:#f2e307; color:#0a2a30;
+    box-shadow:0 4px 0 #1e3a8a;
+  }
+  .surf-scene-bali .surf-banner{
+    position:absolute; left:6%; top:58%;
+    max-width:min(70vw, 520px);
+    font-size:clamp(11px, 2.2vw, 14px); font-weight:800;
+    letter-spacing:0.04em; line-height:1.35;
+    padding:8px 12px;
+    background:#f2e307; color:#0a2a30;
+    box-shadow:6px 6px 0 #1e3a8a;
+  }
+  .surf-scene-bali .surf-dot{
+    position:absolute; width:18px; height:18px; border-radius:50%;
+    background:#1e3a8a; opacity:0.85;
+  }
+  .surf-scene-bali .d1{ top:18%; left:22%; width:22px; height:22px; }
+  .surf-scene-bali .d2{ top:24%; left:55%; width:14px; height:14px; }
+  .surf-scene-bali .d3{ top:48%; left:78%; width:20px; height:20px; }
+  .surf-scene-bali .d4{ top:72%; left:30%; width:12px; height:12px; }
+  .surf-scene-bali .d5{ top:66%; left:62%; width:16px; height:16px; }
+  .surf-scene-bali .d6{ top:14%; left:72%; width:10px; height:10px; opacity:0.6; }
+  .surf-scene-bali .surf-collage{
+    position:absolute; right:2%; top:12%; bottom:14%;
+    width:min(18vw, 140px);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .surf-scene-bali .surf-tile{
+    flex:1; border-radius:6px; min-height:0;
+    border:2px solid rgba(255,255,255,0.35);
+    box-shadow:0 10px 24px rgba(0,0,0,0.3);
+    background-size:cover; background-position:center;
+  }
+  .surf-scene-bali .t-palm{
+    background:
+      linear-gradient(160deg, rgba(6,40,46,0.2), transparent 40%),
+      radial-gradient(ellipse at 50% 100%, #166534, transparent 55%),
+      linear-gradient(180deg, #7dd3fc, #22c55e 70%, #14532d);
+  }
+  .surf-scene-bali .t-ride{
+    background:
+      radial-gradient(circle at 40% 50%, rgba(255,255,255,0.5), transparent 35%),
+      linear-gradient(135deg, #0ea5e9, #0369a1 50%, #0c4a6e);
+  }
+  .surf-scene-bali .t-shop{
+    background:
+      repeating-linear-gradient(90deg, #ef4444 0 18%, #3b82f6 18% 36%, #f8fafc 36% 54%, #eab308 54% 72%, #22c55e 72% 90%, #a855f7 90% 100%),
+      #0f172a;
+    background-size:100% 70%, auto;
+    background-repeat:no-repeat;
+    background-position:center bottom, center;
+  }
+  .surf-scene-bali .t-cove{
+    background:
+      linear-gradient(180deg, #38bdf8 0%, #0ea5e9 40%, #78716c 70%, #57534e 100%);
+  }
+  .surf-scene-bali .surf-boards{
+    position:absolute; left:0; top:18%; bottom:22%; width:52px;
+    display:flex; flex-direction:column; gap:8px; padding:8px 0;
+  }
+  .surf-scene-bali .sb{
+    flex:1; border-radius:0 40px 40px 0;
+    box-shadow:2px 4px 10px rgba(0,0,0,0.3);
+  }
+  .surf-scene-bali .sb1{ background:linear-gradient(90deg, #ef4444, #fca5a5); width:48px; }
+  .surf-scene-bali .sb2{ background:linear-gradient(90deg, #2563eb, #93c5fd); width:40px; }
+  .surf-scene-bali .sb3{ background:linear-gradient(90deg, #f8fafc, #e2e8f0); width:52px; }
+  .surf-scene-bali .sb4{ background:linear-gradient(90deg, #eab308, #fde047); width:36px; }
+  .surf-scene-bali .sb5{ background:linear-gradient(90deg, #0f172a, #64748b); width:44px; }
+  @keyframes surf-foam-drift{
+    0%,100%{ transform:translate(0,0) scale(1); opacity:0.8; }
+    50%{ transform:translate(12px,-8px) scale(1.03); opacity:0.95; }
+  }
+  @media (max-width:760px){
+    .surf-scene-bali .surf-collage{ width:72px; right:4px; top:10%; gap:6px; }
+    .surf-scene-bali .surf-boards{ width:28px; }
+    .surf-scene-bali .surf-word{ font-size:clamp(48px, 18vw, 90px); left:10%; }
+    .surf-scene-bali .surf-pill{ left:auto; right:22%; top:22%; }
+    .surf-scene-bali .surf-banner{ max-width:78vw; font-size:10px; }
+    .surf-scene-bali .surf-wave-sheet{ opacity:0.35; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .surf-scene-bali .surf-foam{ animation:none; }
+  }
+
+  .theme-quest-hint{
+    font-size:12px; line-height:1.45; margin:-8px 0 16px;
+  }
+  .theme-quest-rj{ color:#8b0000; }
+  .theme-quest-depth{ color:#2ec4b6; }
+  .theme-quest-sakura{ color:#c2557a; }
+  .theme-quest-surf{ color:#f2e307; }
+  .theme-quest-acid{ color:#ff66dd; }
+  .theme-quest-storm{ color:#6b8cae; }
+  .theme-quest-cyber{ color:#3df0e0; }
+  .promo-row{
+    display:flex; gap:10px; align-items:flex-end; margin:0 0 16px;
+    flex-wrap:wrap;
+  }
+  .promo-row .btn{ flex:none; height:42px; }
   .fx-drip{
     position:absolute;
     top:-10%;
@@ -856,11 +1171,13 @@
     animation-name: fx-drip-fall;
     animation-timing-function:linear;
     animation-iteration-count:infinite;
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
   }
   @keyframes fx-drip-fall{
-    0%{ transform:translateY(-10vh); opacity:0; }
+    0%{ transform:translate3d(0,-10vh,0); opacity:0; }
     15%{ opacity:1; }
-    100%{ transform:translateY(110vh); opacity:0.15; }
+    100%{ transform:translate3d(0,110vh,0); opacity:0.15; }
   }
   @keyframes fx-fall{
     0%{ transform:translateY(0) translateX(0) rotate(0deg); }
@@ -877,6 +1194,31 @@
   }
   @media (prefers-reduced-motion:reduce){
     .fx-particle{ animation:none; display:none; }
+  }
+  /* Force FX when app opts in (overrides Android "reduce motion" for Red John drips) */
+  html[data-fx="on"] .fx-particle{
+    display:block;
+  }
+  html[data-fx="on"] .fx-drip{
+    animation-name: fx-drip-fall !important;
+    animation-timing-function:linear !important;
+    animation-iteration-count:infinite !important;
+    -webkit-animation-name: fx-drip-fall !important;
+    -webkit-animation-timing-function:linear !important;
+    -webkit-animation-iteration-count:infinite !important;
+  }
+  html[data-fx="on"] .fx-petal,
+  html[data-fx="on"] .fx-ash{
+    animation-name:fx-fall !important;
+    animation-iteration-count:infinite !important;
+  }
+  html[data-fx="on"] .fx-rain{
+    animation-name:fx-rain-fall !important;
+    animation-iteration-count:infinite !important;
+  }
+  html[data-fx="on"] .fx-bubble{
+    animation-name:fx-bubble-rise !important;
+    animation-iteration-count:infinite !important;
   }
 
   /* ---------- Reward moment ---------- */

@@ -257,6 +257,37 @@
     state.secrets.unlocked = state.secrets.unlocked || [];
   }
 
+  function syncSecretUnlocks(quiet){
+    ensureSecrets();
+    let changed = false;
+    const hasBook = (state.books || []).some(function(b){
+      return b && isRedJohnBook(b.title, b.author);
+    });
+    if(hasBook && !isSecretThemeUnlocked('redjohn')){
+      if(quiet){
+        state.secrets.unlocked.push('redjohn');
+        changed = true;
+      } else {
+        unlockRedJohn('book');
+        changed = true;
+      }
+    }
+    if((state.secrets.themeSwaps || 0) >= 10 && !isSecretThemeUnlocked('redjohn')){
+      if(quiet){
+        state.secrets.unlocked.push('redjohn');
+        changed = true;
+      } else {
+        unlockRedJohn('swaps');
+        changed = true;
+      }
+    }
+    if(state.theme === 'redjohn' && !isSecretThemeUnlocked('redjohn')){
+      state.secrets.unlocked.push('redjohn');
+      changed = true;
+    }
+    return changed;
+  }
+
   function isSecretThemeUnlocked(id){
     ensureSecrets();
     return state.secrets.unlocked.indexOf(id) !== -1;
@@ -694,6 +725,7 @@
       if(state.themeAnim[id] === undefined) state.themeAnim[id] = true;
     });
     ensureSecrets();
+    syncSecretUnlocks(true);
     if(state.theme === 'redjohn' && !isSecretThemeUnlocked('redjohn')){
       state.secrets.unlocked.push('redjohn');
     }
@@ -2194,6 +2226,7 @@
         case 'delete-photo':
           deletePhoto(id); break;
         case 'open-settings':
+          syncSecretUnlocks(true);
           settingsOpen = true; render(); break;
         case 'set-theme': {
           const next = el.dataset.theme;

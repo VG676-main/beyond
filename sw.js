@@ -1,5 +1,5 @@
 /* BEYOND PWA — кэш оболочки. Прогресс в Firebase / localStorage. */
-const CACHE = "beyond-shell-v3";
+const CACHE = "beyond-shell-v4";
 
 function shellUrls() {
   const base = self.registration.scope;
@@ -58,9 +58,11 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // HTML / навигация — сеть первее, чтобы обновления доходили
   const isNav = req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
-  if (isNav) {
+  const isFresh = /\.(js|css|webmanifest)$/i.test(url.pathname) || /\/icons\/red-john\.png$/i.test(url.pathname);
+
+  // HTML + JS/CSS — сеть первее, чтобы обновления доходили на ПК
+  if (isNav || isFresh) {
     event.respondWith(
       fetch(req)
         .then((res) => {
@@ -75,7 +77,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Статика — кэш, потом сеть
   event.respondWith(
     caches.match(req).then((hit) => {
       const network = fetch(req)

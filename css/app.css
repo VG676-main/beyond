@@ -378,13 +378,13 @@
 
   .rj-mark{
     position:absolute;
-    right:-2%;
-    bottom:-4%;
-    width:min(52vw, 420px);
-    opacity:0.34;
-    mix-blend-mode:screen;
-    filter:contrast(1.08) saturate(1.15);
+    right:2%;
+    bottom:2%;
+    width:min(42vw, 360px);
+    opacity:0.55;
+    filter:contrast(1.08) saturate(1.2);
     animation: rj-pulse 7s ease-in-out infinite;
+    z-index:1;
   }
   .rj-mark-img{
     display:block;
@@ -394,14 +394,14 @@
     -webkit-user-drag:none;
   }
   @media (max-width:760px){
-    .rj-mark{ width:min(78vw, 320px); opacity:0.18; right:-8%; bottom:-2%; }
+    .rj-mark{ width:min(70vw, 280px); opacity:0.45; right:0; bottom:56px; }
   }
   @keyframes rj-pulse{
-    0%,100%{ opacity:0.28; transform:scale(1); }
-    50%{ opacity:0.42; transform:scale(1.025); }
+    0%,100%{ opacity:0.45; transform:scale(1); }
+    50%{ opacity:0.62; transform:scale(1.02); }
   }
   @media (prefers-reduced-motion: reduce){
-    .rj-mark{ animation:none; }
+    .rj-mark{ animation:none; opacity:0.55; }
   }
 
   .theme-swatch-secret{
@@ -816,7 +816,7 @@
   .swatch-name{ font-size:12.5px; font-weight:700; color:var(--text); }
 
   /* ---------- Theme FX ---------- */
-  #petal-layer{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:5; }
+  #petal-layer{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:40; }
   .fx-particle{
     position:absolute; top:-12%; line-height:1;
     animation-timing-function:linear; animation-iteration-count:infinite; will-change:transform;

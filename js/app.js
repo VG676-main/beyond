@@ -42,6 +42,7 @@
     { id:'graphite', name:'Графит',   icon:'◆',  swatchA:'#f0f0f2', swatchB:'#1a1a1c' },
     { id:'storm',    name:'Шторм',    icon:'⛈️', swatchA:'#6b8cae', swatchB:'#1a2330' },
     { id:'berry',    name:'Ягода',    icon:'🫐', swatchA:'#C33764', swatchB:'#1D2671' },
+    { id:'redjohn',  name:'Red John', icon:'🩸', swatchA:'#8b0000', swatchB:'#000000', secret:true },
   ];
 
   const THEME_FX = {
@@ -50,6 +51,7 @@
     depth:    { kind:'bubble', count:22 },
     storm:    { kind:'rain', count:42 },
     berry:    { kind:'ash', count:12 },
+    redjohn:  { kind:'drip', count:16 },
   };
 
   const AVATARS = [
@@ -213,6 +215,11 @@
         const size = (6 + Math.random()*16).toFixed(0);
         const opacity = (0.18 + Math.random()*0.35).toFixed(2);
         html += '<span class="fx-particle fx-bubble" style="left:' + left + '%; width:' + size + 'px; height:' + size + 'px; animation-duration:' + duration + 's; animation-delay:-' + delay + 's; --drift:' + drift + 'px; opacity:' + opacity + ';"></span>';
+      } else if(fx.kind === 'drip'){
+        const duration = (4 + Math.random()*5).toFixed(1);
+        const h = (18 + Math.random()*36).toFixed(0);
+        const opacity = (0.25 + Math.random()*0.45).toFixed(2);
+        html += '<span class="fx-particle fx-drip" style="left:' + left + '%; height:' + h + 'px; animation-duration:' + duration + 's; animation-delay:-' + delay + 's; opacity:' + opacity + ';"></span>';
       }
     }
     return html;
@@ -226,13 +233,75 @@
     lastAppliedTheme = theme;
     lastFxSignature = fxSig;
     document.documentElement.setAttribute('data-theme', theme);
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if(metaTheme) metaTheme.setAttribute('content', theme === 'redjohn' ? '#000000' : (theme === 'sakura' ? '#fdf2f5' : '#0b0e14'));
     const layer = document.getElementById('petal-layer');
     if(!layer) return;
     layer.innerHTML = '';
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(animOn && !reduceMotion && THEME_FX[theme]){
-      layer.innerHTML = buildThemeFx(theme);
+    if(theme === 'redjohn'){
+      layer.innerHTML =
+        '<div class="rj-mark" aria-hidden="true">' +
+          '<img class="rj-mark-img" src="./icons/red-john.png" alt="">' +
+        '</div>';
     }
+    if(animOn && !reduceMotion && THEME_FX[theme]){
+      layer.innerHTML += buildThemeFx(theme);
+    }
+  }
+
+  function ensureSecrets(){
+    if(!state) return;
+    state.secrets = state.secrets || { themeSwaps:0, unlocked:[] };
+    if(state.secrets.themeSwaps == null) state.secrets.themeSwaps = 0;
+    state.secrets.unlocked = state.secrets.unlocked || [];
+  }
+
+  function isSecretThemeUnlocked(id){
+    ensureSecrets();
+    return state.secrets.unlocked.indexOf(id) !== -1;
+  }
+
+  function visibleThemes(){
+    return THEMES.filter(function(t){
+      return !t.secret || isSecretThemeUnlocked(t.id);
+    });
+  }
+
+  function normalizeSecretText(s){
+    return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  function isRedJohnBook(title, author){
+    return normalizeSecretText(title) === 'red john' && normalizeSecretText(author) === '41';
+  }
+
+  function unlockRedJohn(reason){
+    ensureSecrets();
+    if(isSecretThemeUnlocked('redjohn')) return false;
+    state.secrets.unlocked.push('redjohn');
+    state.theme = 'redjohn';
+    if(state.themeAnim) state.themeAnim.redjohn = true;
+    lastAppliedTheme = null;
+    lastFxSignature = null;
+    const msg = reason === 'book'
+      ? 'Книга найдена. Он улыбается.'
+      : 'Десять раз сменил маску. Red John открыт.';
+    toast(msg, 'achievement');
+    logToday({ icon:'🩸', label:'Секрет: Red John', detail: reason === 'book' ? 'книга Red John · 41' : '10 смен темы' });
+    return true;
+  }
+
+  function maybeUnlockRedJohnFromBook(title, author){
+    if(isRedJohnBook(title, author)) unlockRedJohn('book');
+  }
+
+  function registerThemeSwap(nextTheme){
+    ensureSecrets();
+    if(!nextTheme || nextTheme === state.theme) return false;
+    state.secrets.themeSwaps = (state.secrets.themeSwaps || 0) + 1;
+    if(state.secrets.themeSwaps >= 10) return unlockRedJohn('swaps');
+    return false;
   }
 
   function getAvatarDef(id){
@@ -572,6 +641,7 @@
       trackedAreas: opts.tracked || { workouts:true, books:true, goals:true, tasks:true },
       theme:'obsidian',
       themeAnim:{},
+      secrets:{ themeSwaps:0, unlocked:[] },
       level:1, xp:0,
       sparks:30,
       cosmetics:{ owned: defaultOwnedCosmetics(), equipped: defaultEquipped(), photos: [] },
@@ -623,6 +693,19 @@
     Object.keys(THEME_FX).forEach(function(id){
       if(state.themeAnim[id] === undefined) state.themeAnim[id] = true;
     });
+    ensureSecrets();
+    if(state.theme === 'redjohn' && !isSecretThemeUnlocked('redjohn')){
+      state.secrets.unlocked.push('redjohn');
+    }
+    // Retroactive unlock if the cryptic book already sits on the shelf.
+    (state.books || []).forEach(function(b){
+      if(b && isRedJohnBook(b.title, b.author)){
+        if(!isSecretThemeUnlocked('redjohn')) state.secrets.unlocked.push('redjohn');
+      }
+    });
+    if((state.secrets.themeSwaps || 0) >= 10 && !isSecretThemeUnlocked('redjohn')){
+      state.secrets.unlocked.push('redjohn');
+    }
     state.level = state.level || 1;
     state.xp = state.xp || 0;
     state.level = levelFromXp(state.xp);
@@ -963,6 +1046,7 @@
 
   function addBook(data){
     const book = { id:uid(), title:data.title, author:data.author || 'Неизвестен', pages:data.pages || '', status:data.status, rewarded:false };
+    maybeUnlockRedJohnFromBook(book.title, book.author);
     if(book.status === 'done'){
       book.rewarded = true;
       const before = state.stats.intelligence;
@@ -1237,6 +1321,9 @@
         '<div class="xp-total">Всего опыта: ' + state.xp + '</div></div>' +
     '</div>' +
     (window.Daybook ? Daybook.renderDaySpread() : '') +
+    (state.theme === 'redjohn'
+      ? '<div class="panel rj-banner" aria-hidden="true"><img class="rj-banner-img" src="./icons/red-john.png" alt=""><div class="rj-banner-caption">he is smiling</div></div>'
+      : '') +
     (window.LifeFeatures ? LifeFeatures.renderDashboardExtras() : '') +
     todayFocus +
     '<div class="stat-grid">' + statsHtml + '</div>' +
@@ -1879,9 +1966,13 @@
 
   function renderSettingsModal(){
     const ta = state.trackedAreas;
-    const themeSwatches = THEMES.map(function(t){
-      return '<button type="button" class="theme-swatch ' + (state.theme===t.id ? 'active' : '') + '" data-action="set-theme" data-theme="' + t.id + '" style="--sw-a:' + t.swatchA + '; --sw-b:' + t.swatchB + ';">' +
-        '<span class="swatch-preview"></span><span class="swatch-name">' + t.icon + ' ' + esc(t.name) + (THEME_FX[t.id] ? ' ·✨' : '') + '</span></button>';
+    const themeSwatches = visibleThemes().map(function(t){
+      const secretCls = t.secret ? ' theme-swatch-secret' : '';
+      return '<button type="button" class="theme-swatch' + secretCls + ' ' + (state.theme===t.id ? 'active' : '') + '" data-action="set-theme" data-theme="' + t.id + '" style="--sw-a:' + t.swatchA + '; --sw-b:' + t.swatchB + ';">' +
+        (t.id === 'redjohn'
+          ? '<span class="swatch-preview swatch-preview-rj"><img src="./icons/red-john.png" alt=""></span>'
+          : '<span class="swatch-preview"></span>') +
+        '<span class="swatch-name">' + t.icon + ' ' + esc(t.name) + (THEME_FX[t.id] ? ' ·✨' : '') + (t.secret ? ' · секрет' : '') + '</span></button>';
     }).join('');
     const hasFx = !!THEME_FX[state.theme];
     const animOn = isThemeAnimOn(state.theme);
@@ -2104,10 +2195,22 @@
           deletePhoto(id); break;
         case 'open-settings':
           settingsOpen = true; render(); break;
-        case 'set-theme':
-          state.theme = el.dataset.theme; save(); render();
-          toast('Оформление: ' + (THEMES.find(function(t){ return t.id===state.theme; })||{}).name, 'success');
+        case 'set-theme': {
+          const next = el.dataset.theme;
+          const def = THEMES.find(function(t){ return t.id===next; });
+          if(!def) break;
+          if(def.secret && !isSecretThemeUnlocked(next)){
+            toast('Эта тема ещё скрыта', 'info');
+            break;
+          }
+          const unlockedNow = registerThemeSwap(next);
+          if(!unlockedNow) state.theme = next;
+          lastAppliedTheme = null;
+          lastFxSignature = null;
+          save(); render();
+          if(!unlockedNow) toast('Оформление: ' + def.name, 'success');
           break;
+        }
         case 'toggle-theme-anim': {
           if(!state.themeAnim) state.themeAnim = {};
           state.themeAnim[state.theme] = !isThemeAnimOn(state.theme);

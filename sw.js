@@ -23,6 +23,7 @@ function shellUrls() {
     base + "icons/icon-512.png",
     base + "icons/icon-180.png",
     base + "icons/icon-32.png",
+    base + "icons/red-john.png",
   ];
 }
 

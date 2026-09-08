@@ -292,6 +292,136 @@
     --book-spine-ink:#f4e8f0;
   }
 
+  /* ---------- Theme: Red John (secret) ---------- */
+  html[data-theme="redjohn"]{
+    --bg:#000000;
+    --bg-elev:#0a0a0a;
+    --bg-elev-2:#121212;
+    --bg-elev-3:#1a1a1a;
+    --border:#3a1010;
+    --border-soft:#241010;
+    --text:#f0e6e6;
+    --text-muted:#a08080;
+    --text-dim:#6a4040;
+    --gold:#9a0000;
+    --gold-soft:#2a0808;
+    --gold-light:#c41212;
+    --crimson:#8b0000;
+    --crimson-soft:#240606;
+    --teal:#6a2020;
+    --teal-soft:#1a0808;
+    --violet:#5a1018;
+    --violet-soft:#180608;
+    --on-accent:#0a0000;
+    --glow-1:rgba(154,0,0,0.18);
+    --glow-2:rgba(0,0,0,0.0);
+    --avatar-a:#8b0000;
+    --avatar-b:#2a0000;
+    --shelf-wood:#1a0808;
+    --shelf-wood-mid:#2e1010;
+    --shelf-wood-light:#4a1818;
+    --shelf-inner:#0a0000;
+    --book-1:#8b0000;
+    --book-2:#3a0a0a;
+    --book-3:#c41212;
+    --book-4:#1a1a1a;
+    --book-5:#5a1010;
+    --book-spine-ink:#f0e6e6;
+  }
+  html[data-theme="redjohn"] body{
+    background:
+      radial-gradient(ellipse 700px 500px at 50% 110%, rgba(139,0,0,0.22), transparent 60%),
+      #000;
+  }
+  html[data-theme="redjohn"] .dash-hero,
+  html[data-theme="redjohn"] .day-spread,
+  html[data-theme="redjohn"] .vitrine-hero{
+    border-color:color-mix(in srgb, #8b0000 55%, #1a1a1a);
+    box-shadow:0 0 0 1px rgba(154,0,0,0.12), inset 0 0 40px -24px rgba(154,0,0,0.35);
+  }
+  html[data-theme="redjohn"] .btn-primary{
+    background:linear-gradient(135deg, #8b0000, #c41212);
+    color:#fff5f5;
+  }
+  html[data-theme="redjohn"] .nav-item.active{
+    color:#c41212;
+    border-color:#5a1010;
+  }
+  .rj-banner{
+    margin-bottom:18px;
+    padding:0;
+    overflow:hidden;
+    border:1px solid #3a1010;
+    background:#000;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:180px;
+    position:relative;
+  }
+  .rj-banner-img{
+    display:block;
+    width:min(280px, 70%);
+    height:auto;
+    margin:18px auto 8px;
+    filter:contrast(1.05);
+  }
+  .rj-banner-caption{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:#8b0000;
+    padding:0 12px 16px;
+  }
+
+  .rj-mark{
+    position:absolute;
+    right:-2%;
+    bottom:-4%;
+    width:min(52vw, 420px);
+    opacity:0.34;
+    mix-blend-mode:screen;
+    filter:contrast(1.08) saturate(1.15);
+    animation: rj-pulse 7s ease-in-out infinite;
+  }
+  .rj-mark-img{
+    display:block;
+    width:100%;
+    height:auto;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  @media (max-width:760px){
+    .rj-mark{ width:min(78vw, 320px); opacity:0.18; right:-8%; bottom:-2%; }
+  }
+  @keyframes rj-pulse{
+    0%,100%{ opacity:0.28; transform:scale(1); }
+    50%{ opacity:0.42; transform:scale(1.025); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .rj-mark{ animation:none; }
+  }
+
+  .theme-swatch-secret{
+    border-color:#5a1010 !important;
+    box-shadow:0 0 18px -10px rgba(154,0,0,0.7);
+  }
+  .swatch-preview-rj{
+    display:block;
+    overflow:hidden;
+    border-radius:8px;
+    background:#000 !important;
+  }
+  .swatch-preview-rj img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    opacity:0.95;
+  }
+
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -716,6 +846,21 @@
     box-shadow: inset 0 0 8px color-mix(in srgb, var(--gold-light) 25%, transparent);
     animation-name:fx-bubble-rise;
     animation-timing-function:ease-out;
+  }
+  .fx-drip{
+    position:absolute;
+    top:-10%;
+    width:2px;
+    border-radius:2px;
+    background:linear-gradient(to bottom, transparent, #8b0000 30%, #c41212);
+    animation-name: fx-drip-fall;
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+  @keyframes fx-drip-fall{
+    0%{ transform:translateY(-10vh); opacity:0; }
+    15%{ opacity:1; }
+    100%{ transform:translateY(110vh); opacity:0.15; }
   }
   @keyframes fx-fall{
     0%{ transform:translateY(0) translateX(0) rotate(0deg); }

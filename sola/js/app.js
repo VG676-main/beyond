@@ -5,6 +5,8 @@ import {
   formatDayLabel,
   formatMonthTitle,
   formatPrettyDate,
+  formatWeekdayShort,
+  formatWeekTitle,
   fromEditor,
   groupDayPlans,
   isISODate,
@@ -12,10 +14,11 @@ import {
   sectionHasHeader,
   todayISO,
   uid,
+  weekDates,
   weekStartFor,
   weekdayLabels,
 } from "./model.js";
-import { deleteBody, periodLabel, plansCount, plansToday, sectionLabel, t } from "./i18n.js";
+import { deleteBody, periodLabel, plansCount, plansThisWeek, plansToday, sectionLabel, t } from "./i18n.js";
 import { createRepository, loadSettings, saveSettings } from "./store.js";
 import {
   isStandalone,
@@ -54,6 +57,7 @@ const OFFSETS = [
 
 const ICONS = {
   today: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.25" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.5v1.8M12 18.7v1.8M3.5 12h1.8M18.7 12h1.8M6.1 6.1l1.3 1.3M16.6 16.6l1.3 1.3M17.9 6.1l-1.3 1.3M7.4 16.6l-1.3 1.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+  week: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9.5h17M8 3.6v3M16 3.6v3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="14.2" r="1.05" fill="currentColor"/><circle cx="12" cy="14.2" r="1.05" fill="currentColor"/><circle cx="16" cy="14.2" r="1.05" fill="currentColor"/></svg>',
   month: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3.6v3M16 3.6v3M4 10h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
   plans: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.5h9M9 12h9M9 16.5h9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.8 7.6l1.05 1.05 1.7-2M4.8 12.1l1.05 1.05 1.7-2M4.8 16.6l1.05 1.05 1.7-2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   settings: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h9M4 16h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="16.5" cy="8" r="2.1" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="13" cy="16" r="2.1" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
@@ -129,6 +133,7 @@ function parseRoute() {
   if (name === "day" && isISODate(parts[1])) return { name: "day", date: parts[1] };
   if (name === "plan" && parts[1]) return { name: "plan", id: decodeURIComponent(parts[1]) };
   if (name === "new") return { name: "new", date: isISODate(params.date) ? params.date : todayISO() };
+  if (name === "week") return { name: "week", date: isISODate(params.d) ? params.d : todayISO() };
   if (name === "month") {
     const now = new Date();
     let year = Number(params.y);
@@ -200,6 +205,11 @@ function ensureDraft() {
 
 function addTargetDate() {
   if (route.name === "day") return route.date;
+  if (route.name === "week") {
+    const days = weekDates(route.date, weekStartFor(lang()));
+    const today = todayISO();
+    return days.includes(today) ? today : days[0];
+  }
   if (route.name === "plans" && isISODate(filters.date)) return filters.date;
   return todayISO();
 }
@@ -210,6 +220,7 @@ function openNew() {
 }
 
 function tabName() {
+  if (route.name === "week") return "week";
   if (route.name === "month" || route.name === "day") return "month";
   if (route.name === "plans") return "plans";
   if (route.name === "settings" || route.name === "notifications") return "settings";
@@ -223,6 +234,7 @@ function renderTabs() {
   const current = tabName();
   const items = [
     ["today", "#/today", "today"],
+    ["week", "#/week", "week"],
     ["month", "#/month", "month"],
     ["plans", "#/plans", "plans"],
     ["settings", "#/settings", "settings"],
@@ -241,7 +253,7 @@ function renderTabs() {
 }
 
 function renderDock() {
-  const show = route.name === "today" || route.name === "day" || route.name === "plans";
+  const show = route.name === "today" || route.name === "week" || route.name === "day" || route.name === "plans";
   dock.hidden = !show;
   if (!show) {
     dock.replaceChildren();
@@ -318,6 +330,97 @@ function renderToday() {
   return h("div", { class: "page" }, [
     pageHead(formatPrettyDate(today, lang()), t(lang(), "today"), meta),
     h("div", { class: "page-body" }, [dayBlocks(today, { showWhen: false })]),
+  ]);
+}
+
+function renderWeek() {
+  const anchor = isISODate(route.date) ? route.date : todayISO();
+  const days = weekDates(anchor, weekStartFor(lang()));
+  const today = todayISO();
+  const total = days.reduce((sum, iso) => sum + plansOn(iso).length, 0);
+  const onThisWeek = days.includes(today);
+  const strip = h("div", { class: "week-strip" });
+  for (const iso of days) {
+    const count = plansOn(iso).length;
+    const classes = ["week-chip"];
+    if (iso === today) classes.push("is-today");
+    strip.append(h("button", {
+      type: "button",
+      class: classes.join(" "),
+      "data-action": "week-jump",
+      "data-date": iso,
+      "aria-current": iso === today ? "date" : false,
+      "aria-label": `${formatPrettyDate(iso, lang())}, ${plansCount(lang(), count)}`,
+    }, [
+      h("span", { class: "dow", text: formatWeekdayShort(iso, lang()) }),
+      h("span", { class: "num", text: String(Number(iso.slice(8))) }),
+      h("span", { class: "count", text: count ? String(count) : "" }),
+    ]));
+  }
+  const agenda = h("div", { class: "page-body week-agenda" });
+  for (const iso of days) {
+    const list = plansOn(iso);
+    const label = formatDayLabel(iso, lang());
+    const dateLine = list.length ? `${label.main} · ${plansCount(lang(), list.length)}` : label.main;
+    const section = h("section", {
+      class: `week-day${iso === today ? " is-today" : ""}`,
+      id: `week-${iso}`,
+    }, [
+      h("div", { class: "week-head" }, [
+        h("div", { class: "week-head-text" }, [
+          h("div", { class: "week-dow", text: iso === today ? t(lang(), "today") : label.week }),
+          h("div", { class: "week-date", text: dateLine }),
+        ]),
+        h("button", {
+          type: "button",
+          class: "icon-btn week-add",
+          "data-action": "add-date",
+          "data-date": iso,
+          "aria-label": `${t(lang(), "addOnDay")}, ${formatPrettyDate(iso, lang())}`,
+        }, [icon("plus")]),
+      ]),
+    ]);
+    if (!list.length) {
+      section.append(h("p", { class: "week-empty", text: t(lang(), "dayOpen") }));
+    } else {
+      const stack = h("div", { class: "stack" });
+      for (const group of groupDayPlans(list)) {
+        if (sectionHasHeader(group.key)) {
+          stack.append(h("h3", { class: "section-label", text: sectionLabel(lang(), group.key) }));
+        }
+        for (const plan of group.plans) stack.append(planCard(plan, { showWhen: false }));
+      }
+      section.append(stack);
+    }
+    agenda.append(section);
+  }
+  return h("div", { class: "page" }, [
+    h("header", { class: "page-head" }, [
+      h("div", { class: "month-bar" }, [
+        h("button", {
+          type: "button",
+          class: "icon-btn",
+          "data-action": "week-prev",
+          "aria-label": t(lang(), "prevWeek"),
+        }, [icon("chevronLeft")]),
+        h("h1", { class: "month-title week-title", text: formatWeekTitle(days[0], lang()) }),
+        h("button", {
+          type: "button",
+          class: "icon-btn",
+          "data-action": "week-next",
+          "aria-label": t(lang(), "nextWeek"),
+        }, [icon("chevronRight")]),
+      ]),
+      h("p", { class: "date-meta", text: total ? plansThisWeek(lang(), total) : t(lang(), "nothingPlanned") }),
+      onThisWeek ? null : h("button", {
+        type: "button",
+        class: "jump",
+        "data-action": "week-today",
+        text: t(lang(), "thisWeek"),
+      }),
+    ]),
+    strip,
+    agenda,
   ]);
 }
 
@@ -798,7 +901,8 @@ function render(options = {}) {
   renderTabs();
   renderDock();
   let page;
-  if (route.name === "month") page = renderMonth();
+  if (route.name === "week") page = renderWeek();
+  else if (route.name === "month") page = renderMonth();
   else if (route.name === "day") page = renderDay();
   else if (route.name === "plans") page = renderPlans();
   else if (route.name === "settings") page = renderSettings();
@@ -808,6 +912,7 @@ function render(options = {}) {
   view.replaceChildren(page);
   const titles = {
     today: t(lang(), "today"),
+    week: t(lang(), "week"),
     month: t(lang(), "month"),
     plans: t(lang(), "plans"),
     settings: t(lang(), "settings"),
@@ -980,6 +1085,33 @@ async function onClick(event) {
   }
   if (action === "add") {
     openNew();
+    return;
+  }
+  if (action === "add-date") {
+    returnHash = location.hash || "#/week";
+    location.hash = `#/new?date=${button.dataset.date}`;
+    return;
+  }
+  if (action === "week-prev" || action === "week-next") {
+    const next = addDays(route.date || todayISO(), action === "week-prev" ? -7 : 7);
+    location.hash = `#/week?d=${next}`;
+    return;
+  }
+  if (action === "week-today") {
+    location.hash = `#/week?d=${todayISO()}`;
+    return;
+  }
+  if (action === "week-jump") {
+    const section = document.getElementById(`week-${button.dataset.date}`);
+    document.querySelectorAll(".week-chip").forEach((chip) => {
+      chip.classList.toggle("is-selected", chip.dataset.date === button.dataset.date);
+    });
+    if (section) {
+      const strip = document.querySelector(".week-strip");
+      const stripHeight = strip ? strip.getBoundingClientRect().height : 0;
+      const delta = section.getBoundingClientRect().top - view.getBoundingClientRect().top - stripHeight - 8;
+      view.scrollTop += delta;
+    }
     return;
   }
   if (action === "toggle") {

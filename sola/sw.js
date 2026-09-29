@@ -1,5 +1,5 @@
 /* Sola shell cache. Plans stay in IndexedDB, not here. */
-const CACHE = "sola-shell-v1";
+const CACHE = "sola-shell-v2";
 
 const SHELL = [
   "./",

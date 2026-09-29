@@ -1,6 +1,7 @@
 const DICT = {
   en: {
     today: "Today",
+    week: "Week",
     month: "Month",
     plans: "Plans",
     settings: "Settings",
@@ -63,6 +64,10 @@ const DICT = {
     prevMonth: "Previous month",
     nextMonth: "Next month",
     jumpToday: "Today",
+    thisWeek: "This week",
+    prevWeek: "Previous week",
+    nextWeek: "Next week",
+    addOnDay: "Add a plan",
     back: "Back",
     permission: "Permission",
     permGranted: "Allowed",
@@ -104,6 +109,7 @@ const DICT = {
   },
   ru: {
     today: "Сегодня",
+    week: "Неделя",
     month: "Месяц",
     plans: "Планы",
     settings: "Настройки",
@@ -166,6 +172,10 @@ const DICT = {
     prevMonth: "Предыдущий месяц",
     nextMonth: "Следующий месяц",
     jumpToday: "Сегодня",
+    thisWeek: "Эта неделя",
+    prevWeek: "Прошлая неделя",
+    nextWeek: "Следующая неделя",
+    addOnDay: "Добавить план",
     back: "Назад",
     permission: "Разрешение",
     permGranted: "Разрешено",
@@ -222,6 +232,11 @@ function ruPlural(n, one, few, many) {
 export function plansToday(lang, n) {
   if (lang === "ru") return `${n} ${ruPlural(n, "план", "плана", "планов")} сегодня`;
   return n === 1 ? "1 plan today" : `${n} plans today`;
+}
+
+export function plansThisWeek(lang, n) {
+  if (lang === "ru") return `${n} ${ruPlural(n, "план", "плана", "планов")} на неделе`;
+  return n === 1 ? "1 plan this week" : `${n} plans this week`;
 }
 
 export function plansCount(lang, n) {

@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   comparePlans,
+  formatWeekTitle,
   groupDayPlans,
   reminderInstant,
   sanitizePlan,
   sectionKey,
   sortPlans,
+  startOfWeek,
+  weekDates,
   weekStartFor,
 } from "../js/model.js";
 
@@ -157,6 +160,23 @@ test("sanitize keeps an exact time and drops a conflicting period", () => {
   assert.equal(saved.notes, "easy");
   assert.equal(saved.remindOffset, 30);
   assert.throws(() => sanitizePlan({ id: "a", title: "   ", date: "2026-09-28" }));
+});
+
+test("a week is seven days from the locale start", () => {
+  assert.equal(startOfWeek("2026-09-28", 1), "2026-09-28");
+  assert.equal(startOfWeek("2026-09-28", 0), "2026-09-27");
+  assert.deepEqual(weekDates("2026-09-30", 1), [
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30",
+    "2026-10-01",
+    "2026-10-02",
+    "2026-10-03",
+    "2026-10-04",
+  ]);
+  assert.equal(formatWeekTitle("2026-09-07", "en"), "September 7–13");
+  assert.match(formatWeekTitle("2026-09-07", "ru"), /^7–13 /);
+  assert.equal(formatWeekTitle("2026-09-28", "en"), "Sep 28 – Oct 4");
 });
 
 test("week starts on Monday in Russian and Sunday in English", () => {

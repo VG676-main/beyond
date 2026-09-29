@@ -203,6 +203,47 @@ export function formatPrettyDate(iso, lang, now = new Date()) {
   return capitalize(text);
 }
 
+export function startOfWeek(iso, weekStart) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  const diff = (date.getDay() - weekStart + 7) % 7;
+  date.setDate(date.getDate() - diff);
+  return toISO(date);
+}
+
+export function weekDates(iso, weekStart) {
+  const start = startOfWeek(iso, weekStart);
+  return Array.from({ length: 7 }, (_, index) => addDays(start, index));
+}
+
+export function formatWeekTitle(startIso, lang) {
+  const endIso = addDays(startIso, 6);
+  const [y1, m1, d1] = startIso.split("-").map(Number);
+  const [y2, m2, d2] = endIso.split("-").map(Number);
+  const start = new Date(y1, m1 - 1, d1);
+  const end = new Date(y2, m2 - 1, d2);
+  const locale = localeFor(lang);
+  const sameMonth = y1 === y2 && m1 === m2;
+  if (sameMonth) {
+    if (lang === "ru") {
+      const sample = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" }).format(start);
+      const month = sample.replace(/^\d+\s*/, "");
+      return `${d1}–${d2} ${month}`;
+    }
+    const month = new Intl.DateTimeFormat(locale, { month: "long" }).format(start);
+    return `${capitalize(month)} ${d1}–${d2}`;
+  }
+  const fmt = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" });
+  return `${capitalize(fmt.format(start))} – ${capitalize(fmt.format(end))}`;
+}
+
+export function formatWeekdayShort(iso, lang) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Intl.DateTimeFormat(localeFor(lang), { weekday: "short" })
+    .format(new Date(y, m - 1, d))
+    .replace(".", "");
+}
+
 export function formatMonthTitle(year, monthIndex, lang) {
   const text = new Intl.DateTimeFormat(localeFor(lang), {
     month: "long",

@@ -347,7 +347,7 @@ button, .card-title { user-select: none; }
   gap: 8px;
 }
 .month-title { text-align: center; font-size: clamp(26px, 6vw, 34px); }
-.icon-btn, .back-btn, .link-btn, .text-btn {
+.icon-btn, .back-btn, .link-btn, .text-btn, .jump {
   border: 0;
   background: transparent;
   color: var(--accent-text);
@@ -360,6 +360,96 @@ button, .card-title { user-select: none; }
   border-radius: 14px;
 }
 .icon-btn:active, .tab:active, .day-cell:active, .card-main:active { opacity: 0.72; }
+.week-title { font-size: clamp(22px, 5.4vw, 30px); }
+.week-strip {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  width: min(680px, 100%);
+  margin: 0 auto;
+  padding: 4px 12px 10px;
+  background: var(--bg);
+}
+.week-chip {
+  min-height: 68px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+.week-chip .dow {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.week-chip .num {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.week-chip.is-today .num {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.week-chip.is-selected:not(.is-today) .num {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+.week-chip .count {
+  min-height: 13px;
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.week-agenda { padding-top: 4px; }
+.week-day {
+  margin-bottom: 12px;
+  padding: 4px 4px 8px;
+  border-radius: 20px;
+}
+.week-day.is-today { background: var(--accent-soft); }
+.week-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 0 0 10px;
+}
+.week-head-text { flex: 1; min-width: 0; }
+.week-dow { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+.week-day.is-today .week-dow { color: var(--accent-text); }
+.week-date {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+.week-add { flex: none; }
+.week-empty {
+  margin: 0 12px 8px;
+  color: var(--text-faint);
+  font-size: 14px;
+}
+.week-day .stack { padding: 0 6px 4px; }
+.week-day .card {
+  box-shadow: none;
+  background: var(--surface);
+}
+.week-day .section-label { margin-left: 8px; }
+
 .jump, .back-btn {
   min-height: 36px;
   margin-top: 4px;
@@ -367,6 +457,7 @@ button, .card-title { user-select: none; }
   font-size: 15px;
   font-weight: 600;
 }
+.jump { display: inline-flex; align-items: center; }
 .back-btn {
   display: inline-flex;
   align-items: center;
@@ -738,7 +829,7 @@ button, input, textarea { touch-action: manipulation; }
   -webkit-backdrop-filter: saturate(180%) blur(18px);
   padding-bottom: env(safe-area-inset-bottom);
 }
-.tabs-inner { display: grid; grid-template-columns: repeat(4, 1fr); }
+.tabs-inner { display: grid; grid-template-columns: repeat(5, 1fr); }
 .tab {
   min-height: 52px;
   padding: 6px 0 8px;
@@ -751,7 +842,8 @@ button, input, textarea { touch-action: manipulation; }
   justify-content: center;
   gap: 2px;
 }
-.tab span { font-size: 11px; font-weight: 600; }
+.tab span { font-size: 10px; font-weight: 600; letter-spacing: -0.02em; }
+.tab .icon svg { width: 22px; height: 22px; }
 .tab.is-active { color: var(--accent-text); }
 .icon { display: block; pointer-events: none; }
 .icon svg { display: block; width: 24px; height: 24px; }

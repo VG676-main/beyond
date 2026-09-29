@@ -18,43 +18,15 @@ cd sola
 npm test
 ```
 
-## Постоянная ссылка
+## Ссылка
 
-Отдельный репозиторий `sola` отсюда создать нельзя: у среды есть доступ только к `VG676-main/beyond`.
-
-Пока Sola лежит в папке `sola/` этого репозитория и не заменяет BEYOND. После слияния в `main` существующий деплой GitHub Pages опубликует её по адресу:
+Открывайте только этот адрес, в Safari на Mac и на iPhone:
 
 **https://vg676-main.github.io/beyond/sola/**
 
-Что сделать:
+Адрес с текстом «ваш-аккаунт» из старой инструкции — не сайт. Safari превращает его в punycode и показывает 404 GitHub Pages. Это не поломка Sola.
 
-1. Открыть pull request этой ветки.
-2. Нажать **Merge pull request**.
-3. Дождаться зелёного workflow **Deploy to GitHub Pages**.
-4. Открыть ссылку выше в Safari на iPhone.
-
-BEYOND остаётся на `https://vg676-main.github.io/beyond/`. В его service worker запросы к `/sola/` больше не перехватываются, и он не стирает кэш Sola.
-
-### Отдельный репозиторий, если нужна короткая ссылка
-
-1. Войдите в GitHub под аккаунтом, где хотите хранить Sola.
-2. Откройте [github.com/new](https://github.com/new).
-3. Repository name: `sola`. Public. Без README, без .gitignore, без лицензии. **Create repository**.
-4. В папке `sola` этого проекта:
-
-```bash
-cd sola
-git init
-git add .
-git commit -m "Add Sola planner"
-git branch -M main
-git remote add origin https://github.com/ВАШ-АККАУНТ/sola.git
-git push -u origin main
-```
-
-5. В репозитории: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-6. Workflow `Deploy Sola to GitHub Pages` уже лежит в `.github/workflows/pages.yml`. После первого пуша откройте **Actions** и дождитесь зелёной галочки.
-7. Ссылка будет вида `https://ВАШ-АККАУНТ.github.io/sola/`.
+BEYOND остаётся на https://vg676-main.github.io/beyond/.
 
 ## Экран «Домой» на iPhone
 

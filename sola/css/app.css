@@ -182,7 +182,9 @@ button, .card-title { user-select: none; }
 }
 
 #app {
+  min-height: 100vh;
   min-height: 100dvh;
+  height: 100vh;
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -838,9 +840,10 @@ button, input, textarea { touch-action: manipulation; }
 }
 
 @media (min-width: 840px) {
-  body { min-height: 100dvh; }
+  body { min-height: 100vh; min-height: 100dvh; }
   #app {
     width: min(720px, calc(100% - 48px));
+    height: min(920px, calc(100vh - 48px));
     height: min(920px, calc(100dvh - 48px));
     min-height: 0;
     margin: 24px auto;

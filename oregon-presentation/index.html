@@ -655,17 +655,50 @@
       .trio img { height: 78px; }
     }
 
+    @page {
+      size: 13.333in 7.5in;
+      margin: 0;
+    }
+
     @media print {
-      .bg, .controls { display: none !important; }
-      .deck { height: auto; overflow: visible; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      html, body { background: #14201c; }
+      .bg, .controls, dialog { display: none !important; }
+      .deck { height: auto; overflow: visible; scroll-snap-type: none; }
       .frame {
-        height: auto;
-        min-height: 100vh;
+        height: 7.5in;
+        min-height: 7.5in;
+        max-height: 7.5in;
         page-break-after: always;
-        padding: 16px;
-        background: #c9c3b8;
+        break-after: page;
+        padding: 0.28in 0.36in;
+        background:
+          linear-gradient(180deg, rgba(12, 18, 16, 0.28), rgba(12, 18, 16, 0.42)),
+          url("images/bg.jpg") center 42% / cover no-repeat;
       }
-      .card { box-shadow: none; height: 660px; width: 1140px; }
+      .frame:last-child { page-break-after: auto; break-after: auto; }
+      .card {
+        width: 12.5in;
+        height: 6.9in;
+        max-width: none;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      }
+      .nav { flex-wrap: nowrap !important; white-space: nowrap !important; font-size: 11px !important; gap: 22px !important; }
+      .hero { grid-template-columns: minmax(200px, 0.82fr) minmax(300px, 1.15fr) minmax(250px, 0.95fr) !important; overflow: visible !important; }
+      .hero-art, .hero-side, .leaves-corner { display: flex !important; }
+      .leaves-corner { display: block !important; }
+      .eco { grid-template-columns: repeat(4, 1fr) !important; }
+      .steps { grid-template-columns: repeat(3, 1fr) !important; }
+      .split { grid-template-columns: 1.05fr 0.95fr !important; }
+      .split-photo { height: auto !important; }
+      .facts { grid-template-columns: 1fr 1fr !important; grid-template-rows: 1fr 1fr !important; overflow: visible !important; }
+      .trio { grid-template-columns: repeat(3, 1fr) !important; }
+      .trio img { height: 112px !important; }
+      .head-leaves { width: 280px !important; height: 148px !important; }
+      .roses { width: min(250px, 70%) !important; }
+      h1 { font-size: 92px !important; }
+      .photo-copy h2 { font-size: 72px !important; }
+      .close h2 { font-size: 108px !important; }
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Орегон — презентация</title>
+  <meta name="description" content="Шесть слайдов об Орегоне: расположение, природа, экономика, Портленд и факты.">
+  <link rel="stylesheet" href="fonts.css">
+  <style>
+    :root {
+      --cream: #f4efe4;
+      --ink: #241f1b;
+      --muted: #5c564c;
+      --line: rgba(36, 31, 27, 0.16);
+      --sage: #d7e39a;
+      --moss: #3c5346;
+      --ochre: #d7b56a;
+      --dark: #1c1a17;
+      --forest: #1b2822;
+      --rose: #c45d76;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      color: var(--ink);
+      font-family: Manrope, "Segoe UI", sans-serif;
+      background: #14201c;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(12, 18, 16, 0.28), rgba(12, 18, 16, 0.42)),
+        url("images/bg.jpg") center 42% / cover no-repeat;
+      z-index: 0;
+    }
+
+    .deck {
+      position: relative;
+      z-index: 1;
+      height: 100dvh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+    .deck::-webkit-scrollbar { display: none; }
+
+    .frame {
+      height: 100dvh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: grid;
+      place-items: center;
+      padding: 22px 28px 84px;
+    }
+
+    .card {
+      width: min(1140px, 100%);
+      height: min(660px, 100%);
+      background: var(--cream);
+      border-radius: 22px;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .nav {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 16px 28px 13px;
+      border-bottom: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .nav a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .nav a.brand { font-weight: 750; }
+    .nav a.brand::after {
+      content: "";
+      display: inline-block;
+      width: 1px;
+      height: 11px;
+      margin-left: 18px;
+      background: currentColor;
+      opacity: 0.35;
+      vertical-align: -1px;
+    }
+    .nav a[aria-current="page"] {
+      box-shadow: inset 0 -1.5px 0 currentColor;
+    }
+    .nav a:hover { opacity: 0.62; }
+
+    .kicker {
+      margin: 0 0 4px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    h1, h2, h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600; }
+    h1 {
+      margin: 0;
+      font-size: clamp(64px, 7vw, 104px);
+      line-height: 0.88;
+      letter-spacing: 0.01em;
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(42px, 4.6vw, 64px);
+      line-height: 0.92;
+    }
+
+    /* Slide 1 */
+    .hero {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(200px, 0.82fr) minmax(300px, 1.15fr) minmax(250px, 0.95fr);
+      align-items: stretch;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-art {
+      display: flex;
+      align-items: flex-end;
+      min-height: 0;
+    }
+    .hero-art img {
+      width: 118%;
+      max-height: 104%;
+      object-fit: contain;
+      object-position: left bottom;
+      margin: 0 0 -4% -6%;
+      pointer-events: none;
+      user-select: none;
+    }
+    .hero-copy {
+      padding: 22px 8px 26px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-copy .sub {
+      margin: 12px 0 0;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-style: italic;
+      font-size: 26px;
+      color: #3f4638;
+    }
+    .hero-copy .lead {
+      margin: 14px 0 0;
+      max-width: 38em;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #3a342c;
+    }
+    .hero-side {
+      position: relative;
+      padding: 16px 22px 16px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      min-height: 0;
+    }
+    .leaves-corner {
+      position: absolute;
+      right: -24px;
+      top: -8px;
+      width: min(280px, 34%);
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+    .badge {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: var(--sage);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1;
+      position: relative;
+      z-index: 2;
+      flex: none;
+      box-shadow: 0 8px 18px rgba(60, 70, 30, 0.08);
+    }
+    .badge-k {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .badge strong {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 36px;
+      font-weight: 600;
+    }
+    .badge span:last-child {
+      margin-top: 2px;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .map {
+      width: 100%;
+      height: auto;
+      max-height: calc(100% - 120px);
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+    }
+    .map text {
+      font-family: Manrope, sans-serif;
+      font-size: 15px;
+      fill: #5a554c;
+      letter-spacing: 0.04em;
+    }
+    .map .name {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 36px;
+      fill: #24352c;
+      letter-spacing: 0.02em;
+    }
+    .map .city {
+      font-size: 13px;
+      fill: #241f1b;
+      font-weight: 700;
+    }
+
+    /* Slide 2 */
+    .on-photo { background: #102033; color: #f7f3ea; }
+    .on-photo .nav { border-bottom-color: rgba(255, 255, 255, 0.28); }
+    .fill, .veil { position: absolute; inset: 0; }
+    .fill { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+    .veil {
+      background:
+        linear-gradient(180deg, rgba(8, 16, 28, 0.45) 0%, rgba(8, 16, 28, 0.05) 32%, rgba(8, 16, 28, 0.08) 58%, rgba(8, 16, 28, 0.28) 100%);
+      pointer-events: none;
+    }
+    .on-photo .nav,
+    .photo-copy,
+    .sheet { position: relative; z-index: 2; }
+    .photo-copy {
+      text-align: center;
+      padding: 22px 32px 0;
+    }
+    .photo-copy .kicker { color: rgba(247, 243, 234, 0.82); }
+    .photo-copy h2 {
+      color: white;
+      font-size: clamp(56px, 6vw, 88px);
+      text-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+    .sheet {
+      margin: auto 16px 16px;
+      background: var(--cream);
+      color: var(--ink);
+      border-radius: 16px;
+      padding: 16px 16px 12px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .step {
+      border: 1.5px dashed rgba(36, 31, 27, 0.38);
+      border-radius: 16px;
+      padding: 12px 14px 14px;
+    }
+    .step-h {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--cream);
+      display: grid;
+      place-items: center;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 16px;
+      flex: none;
+    }
+    .step h3 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1;
+    }
+    .step p, .sheet-note {
+      margin: 0;
+      font-size: 14.5px;
+      line-height: 1.4;
+      color: #3a342c;
+    }
+    .sheet-note {
+      margin-top: 10px;
+      padding: 0 6px;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-style: italic;
+      font-size: 20px;
+      color: #3f4638;
+    }
+
+    /* Slide 3 */
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 28px 12px;
+    }
+    .section-head .kicker { margin-bottom: 6px; }
+    .head-leaves {
+      width: 280px;
+      height: 148px;
+      object-fit: cover;
+      object-position: 88% 42%;
+      pointer-events: none;
+      user-select: none;
+    }
+    .eco-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 22px 18px;
+    }
+    .eco {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .eco .step {
+      display: flex;
+      flex-direction: column;
+      padding: 16px 16px 18px;
+    }
+    .eco .step h3 { font-size: 28px; }
+    .eco .step p { font-size: 15px; }
+
+    /* Slide 4 */
+    .split {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+    }
+    .split-photo { min-height: 0; }
+    .split-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 42%;
+      display: block;
+    }
+    .split-copy {
+      position: relative;
+      padding: 18px 26px 8px 28px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .split-copy .lead {
+      margin: 14px 0 0;
+      font-size: 16.5px;
+      line-height: 1.48;
+      color: #3a342c;
+      max-width: 36em;
+    }
+    .rose-fact {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-start;
+      background: var(--ink);
+      color: var(--cream);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+    .roses {
+      width: min(250px, 70%);
+      margin: auto -6px -8px auto;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Slide 5 */
+    .facts {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      padding: 14px 20px 18px;
+    }
+    .fact {
+      border-radius: 16px;
+      padding: 16px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .fact-n {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .fact h3 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      line-height: 1;
+    }
+    .fact p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.4;
+      max-width: 42em;
+    }
+    .fact-dark { background: var(--dark); color: var(--cream); }
+    .fact-dark .fact-n { color: var(--ochre); }
+    .fact-cream {
+      background: transparent;
+      border: 1.5px dashed rgba(36, 31, 27, 0.4);
+    }
+    .fact-cream .fact-n { color: var(--rose); }
+    .fact-ochre { background: var(--ochre); color: var(--ink); }
+    .fact-moss { background: var(--moss); color: var(--cream); }
+    .fact-moss .fact-n { color: #f3e2b0; }
+
+    /* Slide 6 */
+    .on-dark { background: var(--forest); color: var(--cream); }
+    .on-dark .nav { border-bottom-color: rgba(244, 239, 228, 0.16); }
+    .close {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      padding: 22px 36px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .star {
+      position: absolute;
+      right: 28px;
+      top: 36px;
+      width: min(280px, 34%);
+      height: auto;
+      pointer-events: none;
+    }
+    .close h2 {
+      font-size: clamp(72px, 8vw, 120px);
+      position: relative;
+      z-index: 1;
+      max-width: 8em;
+    }
+    .close .kicker { color: rgba(244, 239, 228, 0.62); position: relative; z-index: 1; }
+    .close .lead {
+      position: relative;
+      z-index: 1;
+      margin: 16px 0 0;
+      max-width: 38em;
+      font-size: 18px;
+      line-height: 1.5;
+      color: rgba(244, 239, 228, 0.92);
+    }
+    .trio {
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding-top: 18px;
+    }
+    .trio figure { margin: 0; }
+    .trio img {
+      width: 100%;
+      height: 112px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+    }
+    .trio figcaption {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(244, 239, 228, 0.72);
+    }
+    .trio figure:nth-child(1) img { object-position: center 55%; }
+    .trio figure:nth-child(2) img { object-position: center 30%; }
+    .trio figure:nth-child(3) img { object-position: center 45%; }
+
+    .controls {
+      position: fixed;
+      z-index: 4;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px 6px 14px;
+      background: rgba(244, 239, 228, 0.94);
+      color: var(--ink);
+      border-radius: 999px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+    }
+    .controls button {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--cream);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .controls button:hover { background: #3a332c; }
+    .controls button.texty {
+      width: auto;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .controls button.texty:hover { background: rgba(36, 31, 27, 0.06); }
+    .counter {
+      min-width: 58px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      font-variant-numeric: tabular-nums;
+    }
+    .dots { display: flex; gap: 6px; padding-right: 4px; }
+    .dots button {
+      width: 7px;
+      height: 7px;
+      padding: 0;
+      background: rgba(36, 31, 27, 0.28);
+    }
+    .dots button[aria-current="true"] {
+      width: 18px;
+      border-radius: 999px;
+      background: var(--ink);
+    }
+
+    dialog {
+      border: 0;
+      border-radius: 18px;
+      background: var(--cream);
+      color: var(--ink);
+      padding: 22px 24px 18px;
+      max-width: min(480px, calc(100vw - 32px));
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    dialog::backdrop { background: rgba(16, 22, 18, 0.48); }
+    dialog h2 {
+      font-size: 36px;
+      margin: 0 0 8px;
+    }
+    dialog ul { margin: 8px 0 16px; padding-left: 18px; }
+    dialog li { margin: 6px 0; }
+    dialog a { color: inherit; }
+    dialog button {
+      border: 0;
+      background: var(--ink);
+      color: var(--cream);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    :focus-visible {
+      outline: 2px solid #d7b56a;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 980px) {
+      .frame { padding: 12px 12px 86px; }
+      .nav {
+        gap: 8px 12px;
+        letter-spacing: 0.08em;
+        font-size: 10px;
+        padding: 12px 14px 10px;
+        white-space: normal;
+        flex-wrap: wrap;
+      }
+      .hero { grid-template-columns: 1fr auto; }
+      .hero-art { display: none; }
+      .leaves-corner { display: none; }
+      .eco { grid-template-columns: 1fr 1fr; }
+      .split { grid-template-columns: 1fr; }
+      .split-photo { height: 220px; }
+      .roses { width: 160px; }
+      .star { width: 140px; top: 18px; }
+      .close .lead { font-size: 16px; }
+      .head-leaves { width: 150px; height: 84px; }
+    }
+
+    @media (max-width: 680px) {
+      .card { border-radius: 16px; }
+      .facts, .steps, .eco, .trio { grid-template-columns: 1fr 1fr; }
+      .hero { grid-template-columns: 1fr; padding-bottom: 8px; overflow: auto; }
+      .hero-copy { padding: 8px 16px 4px; }
+      .hero-side { align-items: center; padding: 0 8px 8px; }
+      .badge { width: 86px; height: 86px; }
+      .badge strong { font-size: 28px; }
+      .map { max-height: 168px; }
+      .photo-copy { padding-top: 10px; }
+      .photo-copy h2 { font-size: 46px; }
+      h1 { font-size: 60px; }
+      .close { padding: 16px 18px 14px; }
+      .close h2 { font-size: 64px; }
+      .trio img { height: 78px; }
+    }
+
+    @page {
+      size: 13.333in 7.5in;
+      margin: 0;
+    }
+
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      html, body { background: #14201c; }
+      .bg, .controls, dialog { display: none !important; }
+      .deck { height: auto; overflow: visible; scroll-snap-type: none; }
+      .frame {
+        height: 7.5in;
+        min-height: 7.5in;
+        max-height: 7.5in;
+        page-break-after: always;
+        break-after: page;
+        padding: 0.28in 0.36in;
+        background:
+          linear-gradient(180deg, rgba(12, 18, 16, 0.28), rgba(12, 18, 16, 0.42)),
+          url("images/bg.jpg") center 42% / cover no-repeat;
+      }
+      .frame:last-child { page-break-after: auto; break-after: auto; }
+      .card {
+        width: 12.5in;
+        height: 6.9in;
+        max-width: none;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      }
+      .nav { flex-wrap: nowrap !important; white-space: nowrap !important; font-size: 11px !important; gap: 22px !important; }
+      .hero { grid-template-columns: minmax(200px, 0.82fr) minmax(300px, 1.15fr) minmax(250px, 0.95fr) !important; overflow: visible !important; }
+      .hero-art, .hero-side, .leaves-corner { display: flex !important; }
+      .leaves-corner { display: block !important; }
+      .eco { grid-template-columns: repeat(4, 1fr) !important; }
+      .steps { grid-template-columns: repeat(3, 1fr) !important; }
+      .split { grid-template-columns: 1.05fr 0.95fr !important; }
+      .split-photo { height: auto !important; }
+      .facts { grid-template-columns: 1fr 1fr !important; grid-template-rows: 1fr 1fr !important; overflow: visible !important; }
+      .trio { grid-template-columns: repeat(3, 1fr) !important; }
+      .trio img { height: 112px !important; }
+      .head-leaves { width: 280px !important; height: 148px !important; }
+      .roses { width: min(250px, 70%) !important; }
+      h1 { font-size: 92px !important; }
+      .photo-copy h2 { font-size: 72px !important; }
+      .close h2 { font-size: 108px !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .deck { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="deck" id="deck">
+    <section class="frame" id="s1" aria-label="Расположение">
+      <article class="card">
+        <nav class="nav" aria-label="Разделы">
+          <a class="brand" href="#s1">Орегон</a>
+          <a href="#s1" aria-current="page">Расположение</a>
+          <a href="#s2">Природа</a>
+          <a href="#s3">Экономика</a>
+          <a href="#s4">Портленд</a>
+          <a href="#s5">Факты</a>
+          <a href="#s6">Итог</a>
+        </nav>
+        <img class="leaves-corner" src="images/leaves.webp" alt="">
+        <div class="hero">
+          <div class="hero-art">
+            <img src="images/rhododendron.webp" alt="">
+          </div>
+          <div class="hero-copy">
+            <p class="kicker">Западное побережье США</p>
+            <h1>Орегон</h1>
+            <p class="sub">Штат у Тихого океана</p>
+            <p class="lead">Орегон расположен на западном побережье США. На севере он граничит со штатом Вашингтон, на востоке — с Айдахо, на юге — с Невадой и Калифорнией. На западе штат выходит к Тихому океану.</p>
+          </div>
+          <div class="hero-side">
+            <div class="badge">
+              <span class="badge-k">площадь</span>
+              <strong>255</strong>
+              <span>тыс. км²</span>
+            </div>
+            <svg class="map" viewBox="-100 -36 690 380" role="img" aria-label="Карта: Орегон между Тихим океаном, Вашингтоном, Айдахо, Калифорнией и Невадой">
+              <rect x="-30" y="48" width="130" height="230" rx="46" fill="#d5e4ea"/>
+              <path d="M69.1,33.4 L103.4,37.9 L138.9,62.8 L195,67.9 L239.3,65.1 L298.4,52.6 L381.1,48.1 L479.8,47 L479.8,274.5 L56.1,274.5 L38.4,246.2 L33.7,209.4 L41.4,169.8 L56.1,133 L66.8,99.1 L70.3,65.1 L65,41.3 Z" fill="#e7f0dc" stroke="#2a382e" stroke-width="2.4" stroke-linejoin="round"/>
+              <circle cx="146" cy="75.3" r="8" fill="none" stroke="#c45d76" stroke-width="1.4"/>
+              <circle cx="146" cy="75.3" r="4.2" fill="#c45d76"/>
+              <text class="city" x="160" y="72">Портленд</text>
+              <text class="name" x="268" y="176" text-anchor="middle">Орегон</text>
+              <text x="274" y="4" text-anchor="middle">Вашингтон</text>
+              <text x="498" y="164">Айдахо</text>
+              <text x="150" y="308" text-anchor="middle">Калифорния</text>
+              <text x="360" y="308" text-anchor="middle">Невада</text>
+              <text x="-62" y="150" text-anchor="middle">Тихий</text>
+              <text x="-62" y="170" text-anchor="middle">океан</text>
+            </svg>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="frame" id="s2" aria-label="Природные факторы">
+      <article class="card on-photo">
+        <img class="fill" src="images/hood.jpg" alt="Гора Худ отражается в озере Миррор">
+        <div class="veil" aria-hidden="true"></div>
+        <nav class="nav" aria-label="Разделы">
+          <a class="brand" href="#s1">Орегон</a>
+          <a href="#s1">Расположение</a>
+          <a href="#s2" aria-current="page">Природа</a>
+          <a href="#s3">Экономика</a>
+          <a href="#s4">Портленд</a>
+          <a href="#s5">Факты</a>
+          <a href="#s6">Итог</a>
+        </nav>
+        <div class="photo-copy">
+          <p class="kicker">Природные факторы</p>
+          <h2>Природа Орегона</h2>
+        </div>
+        <div class="sheet">
+          <div class="steps">
+            <div class="step">
+              <div class="step-h"><span class="num">1</span><h3>Каскадные горы</h3></div>
+              <p>Через Орегон проходит горная система Каскадных гор.</p>
+            </div>
+            <div class="step">
+              <div class="step-h"><span class="num">2</span><h3>Гора Худ</h3></div>
+              <p>Самый высокий пик штата и одна из самых известных достопримечательностей.</p>
+            </div>
+            <div class="step">
+              <div class="step-h"><span class="num">3</span><h3>Кратерное озеро</h3></div>
+              <p>Самое глубокое озеро в США. Оно образовалось после извержения вулкана.</p>
+            </div>
+          </div>
+          <p class="sheet-note">Эти ландшафты привлекают множество туристов — людей тянет сюда природа.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="frame" id="s3" aria-label="Экономика">
+      <article class="card">
+        <nav class="nav" aria-label="Разделы">
+          <a class="brand" href="#s1">Орегон</a>
+          <a href="#s1">Расположение</a>
+          <a href="#s2">Природа</a>
+          <a href="#s3" aria-current="page">Экономика</a>
+          <a href="#s4">Портленд</a>
+          <a href="#s5">Факты</a>
+          <a href="#s6">Итог</a>
+        </nav>
+        <div class="section-head">
+          <div>
+            <p class="kicker">Экономические плюсы</p>
+            <h2>Экономика Орегона</h2>
+          </div>
+          <img class="head-leaves" src="images/leaves.webp" alt="">
+        </div>
+        <div class="eco-wrap">
+        <div class="eco">
+          <div class="step">
+            <div class="step-h"><span class="num">1</span><h3>Энергия</h3></div>
+            <p>Лидер возобновляемой энергетики: ветер, солнце и гидроэлектростанции на реке Колумбия.</p>
+          </div>
+          <div class="step">
+            <div class="step-h"><span class="num">2</span><h3>Кремниевый лес</h3></div>
+            <p>Район Портленда, где производят компьютерные чипы. Intel — крупнейший частный работодатель штата.</p>
+          </div>
+          <div class="step">
+            <div class="step-h"><span class="num">3</span><h3>Порты</h3></div>
+            <p>Портленд и Астория отправляют в Азию пшеницу, древесину и технологии.</p>
+          </div>
+          <div class="step">
+            <div class="step-h"><span class="num">4</span><h3>Ёлки</h3></div>
+            <p>Крупнейший производитель рождественских ёлок в США.</p>
+          </div>
+        </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="frame" id="s4" aria-label="Портленд">
+      <article class="card">
+        <nav class="nav" aria-label="Разделы">
+          <a class="brand" href="#s1">Орегон</a>
+          <a href="#s1">Расположение</a>
+          <a href="#s2">Природа</a>
+          <a href="#s3">Экономика</a>
+          <a href="#s4" aria-current="page">Портленд</a>
+          <a href="#s5">Факты</a>
+          <a href="#s6">Итог</a>
+        </nav>
+        <div class="split">
+          <div class="split-photo">
+            <img src="images/portland.jpg" alt="Набережная Уилламетт и центр Портленда">
+          </div>
+          <div class="split-copy">
+            <div>
+              <p class="kicker">Крупнейший город штата</p>
+              <h2>Портленд</h2>
+              <p class="lead">Портленд — крупнейший экономический и культурный центр Орегона. Его называют городом мостов: через реку Уилламетт перекинуто несколько известных мостов.</p>
+              <p class="lead">Город считается важным центром технологий, бизнеса и культуры региона.</p>
+              <p class="lead">Его называют «Городом роз»: здесь популярны розовые сады, и каждый год проходит фестиваль роз.</p>
+            </div>
+            <img class="roses" src="images/roses.webp" alt="">
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="frame" id="s5" aria-label="Интересные факты">
+      <article class="card">
+        <nav class="nav" aria-label="Разделы">
+          <a class="brand" href="#s1">Орегон</a>
+          <a href="#s1">Расположение</a>
+          <a href="#s2">Природа</a>
+          <a href="#s3">Экономика</a>
+          <a href="#s4">Портленд</a>
+          <a href="#s5" aria-current="page">Факты</a>
+          <a href="#s6">Итог</a>
+        </nav>
+        <div class="section-head">
+          <div>
+            <p class="kicker">То, чем штат удивляет</p>
+            <h2>Интересные факты</h2>
+          </div>
+        </div>
+        <div class="facts">
+          <article class="fact fact-dark">
+            <span class="fact-n">01</span>
+            <h3>Заправки</h3>
+            <p>Долгие годы на АЗС Орегона нельзя было заправляться самому — бензин заливал работник станции.</p>
+          </article>
+          <article class="fact fact-cream">
+            <span class="fact-n">02</span>
+            <h3>Выборы</h3>
+            <p>Орегон первым в США перевёл выборы полностью на почтовое голосование.</p>
+          </article>
+          <article class="fact fact-ochre">
+            <span class="fact-n">03</span>
+            <h3>Без налога</h3>
+            <p>В штате нет налога с продаж — одного из немногих таких в стране.</p>
+          </article>
+          <article class="fact fact-moss">
+            <span class="fact-n">04</span>
+            <h3>Powell’s Books</h3>
+            <p>В Портленде находится книжный, который считают крупнейшим независимым в мире.</p>
+          </article>
+        </div>
+      </article>
+    </section>
+
+    <section class="frame" id="s6" aria-label="Заключение">
+      <article class="card on-dark">
+        <nav class="nav" aria-label="Разделы">
+          <a class="brand" href="#s1">Орегон</a>
+          <a href="#s1">Расположение</a>
+          <a href="#s2">Природа</a>
+          <a href="#s3">Экономика</a>
+          <a href="#s4">Портленд</a>
+          <a href="#s5">Факты</a>
+          <a href="#s6" aria-current="page">Итог</a>
+        </nav>
+        <div class="close">
+          <svg class="star" viewBox="0 0 100 100" aria-hidden="true">
+            <rect x="18" y="18" width="64" height="64" fill="#d7b56a"/>
+            <rect x="18" y="18" width="64" height="64" fill="#c6a15a" transform="rotate(45 50 50)"/>
+          </svg>
+          <p class="kicker">Заключение</p>
+          <h2>Орегон</h2>
+          <p class="lead">Штат с очень разнообразной природой и интересными городами. Здесь можно увидеть океан, высокие горы, вулканы, густые леса и красивые озёра. При этом Орегон высокотехнологичный — дикая природа соседствует с «Кремниевым лесом».</p>
+          <div class="trio">
+            <figure>
+              <img src="images/haystack.jpg" alt="Скала Хейстек на побережье Орегона">
+              <figcaption>Океан</figcaption>
+            </figure>
+            <figure>
+              <img src="images/hood.jpg" alt="Снежная вершина горы Худ">
+              <figcaption>Горы</figcaption>
+            </figure>
+            <figure>
+              <img src="images/crater.jpg" alt="Кратерное озеро зимой">
+              <figcaption>Озеро</figcaption>
+            </figure>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div class="controls">
+    <button type="button" id="prev" aria-label="Предыдущий слайд">‹</button>
+    <span class="counter" id="counter">01 / 06</span>
+    <div class="dots" id="dots"></div>
+    <button type="button" id="next" aria-label="Следующий слайд">›</button>
+    <button type="button" class="texty" id="sources-btn">Источники</button>
+  </div>
+
+  <dialog id="sources">
+    <h2>Источники фото</h2>
+    <ul>
+      <li>Побережье Кэннон-Бич — Joe Mabel, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></li>
+      <li>Гора Худ, озеро Миррор — Oregon’s Mt. Hood Territory, общественное достояние</li>
+      <li>Кратерное озеро — WolfmanSF, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a></li>
+      <li>Портленд — M.O. Stevens, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></li>
+      <li>Хейстек-Рок — Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a></li>
+    </ul>
+    <button type="button" id="sources-close">Закрыть</button>
+  </dialog>
+
+  <script>
+    const deck = document.getElementById("deck");
+    const frames = [...document.querySelectorAll(".frame")];
+    const counter = document.getElementById("counter");
+    const dots = document.getElementById("dots");
+
+    frames.forEach((frame, i) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.setAttribute("aria-label", "Слайд " + (i + 1));
+      button.addEventListener("click", () => go(i));
+      dots.append(button);
+    });
+
+    function index() {
+      const height = frames[0].getBoundingClientRect().height || 1;
+      return Math.max(0, Math.min(frames.length - 1, Math.round(deck.scrollTop / height)));
+    }
+
+    function paint() {
+      const current = index();
+      counter.textContent = String(current + 1).padStart(2, "0") + " / 06";
+      [...dots.children].forEach((dot, i) => {
+        dot.setAttribute("aria-current", i === current ? "true" : "false");
+      });
+    }
+
+    function go(i, smooth) {
+      const next = Math.max(0, Math.min(frames.length - 1, i));
+      deck.scrollTo({
+        top: frames[next].offsetTop,
+        behavior: smooth ? "smooth" : "auto"
+      });
+      paint();
+    }
+
+    document.querySelectorAll(".nav a").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const target = frames.findIndex((frame) => "#" + frame.id === link.getAttribute("href"));
+        if (target < 0) return;
+        event.preventDefault();
+        history.pushState(null, "", "#" + frames[target].id);
+        go(target, true);
+      });
+    });
+
+    document.getElementById("prev").addEventListener("click", () => go(index() - 1, true));
+    document.getElementById("next").addEventListener("click", () => go(index() + 1, true));
+    deck.addEventListener("scroll", paint, { passive: true });
+
+    const hashIndex = frames.findIndex((frame) => "#" + frame.id === location.hash);
+    const querySlide = Number(new URLSearchParams(location.search).get("slide"));
+    if (hashIndex >= 0) go(hashIndex, false);
+    else if (querySlide >= 1) go(querySlide - 1, false);
+
+    document.addEventListener("keydown", (event) => {
+      const dialog = document.getElementById("sources");
+      if (dialog.open && event.key === "Escape") return;
+      if (["ArrowDown", "ArrowRight", "PageDown", " "].includes(event.key)) {
+        event.preventDefault();
+        go(index() + 1, true);
+      } else if (["ArrowUp", "ArrowLeft", "PageUp"].includes(event.key)) {
+        event.preventDefault();
+        go(index() - 1, true);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        go(0, true);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        go(frames.length - 1, true);
+      }
+    });
+
+    const sources = document.getElementById("sources");
+    document.getElementById("sources-btn").addEventListener("click", () => sources.showModal());
+    document.getElementById("sources-close").addEventListener("click", () => sources.close());
+
+    paint();
+  </script>
+</body>
+</html>
